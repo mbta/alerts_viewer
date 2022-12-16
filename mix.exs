@@ -51,7 +51,8 @@ defmodule AlertsViewer.MixProject do
       {:bypass, "~> 2.1", only: :test},
       {:gen_stage, "~> 1.1"},
       {:server_sent_event_stage, "~> 1.1"},
-      {:tzdata, "~> 1.1"}
+      {:tzdata, "~> 1.1"},
+      {:credo, "~> 1.6", only: [:dev, :test]}
     ]
   end
 
