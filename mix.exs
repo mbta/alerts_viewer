@@ -9,6 +9,11 @@ defmodule AlertsViewer.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.html": :test
+      ],
       deps: deps()
     ]
   end
@@ -53,7 +58,8 @@ defmodule AlertsViewer.MixProject do
       {:server_sent_event_stage, "~> 1.1"},
       {:tzdata, "~> 1.1"},
       {:credo, "~> 1.6", only: [:dev, :test]},
-      {:dialyxir, "~> 1.2", only: [:dev, :test], runtime: false}
+      {:dialyxir, "~> 1.2", only: [:dev, :test], runtime: false},
+      {:excoveralls, "~> 0.15.1", only: :test}
     ]
   end
 
