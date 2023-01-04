@@ -13,6 +13,8 @@ config :alerts_viewer,
   # Default. Can be configured via environment variable, which is loaded in application.ex
   api_url: {:system, "API_URL"},
   api_key: {:system, "API_KEY"},
+  swiftly_authorization_key: {:system, "SWIFTLY_AUTHORIZATION_KEY"},
+  swiftly_realtime_vehicles_url: {:system, "SWIFTLY_REALTIME_VEHICLES_URL"},
   start_data_processes: true
 
 # Configures the endpoint

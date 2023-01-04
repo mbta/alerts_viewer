@@ -12,7 +12,8 @@ defmodule AlertsViewer.Application do
     children =
       if Application.get_env(:alerts_viewer, :start_data_processes) do
         [
-          Alerts.Supervisor
+          Alerts.Supervisor,
+          Vehicles.Supervisor
         ]
       else
         []
@@ -55,7 +56,9 @@ defmodule AlertsViewer.Application do
   def load_runtime_config do
     application_keys = [
       :api_url,
-      :api_key
+      :api_key,
+      :swiftly_authorization_key,
+      :swiftly_realtime_vehicles_url
     ]
 
     for application_key <- application_keys do
