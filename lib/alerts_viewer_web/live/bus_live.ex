@@ -77,25 +77,34 @@ defmodule AlertsViewerWeb.BusLive do
   def delay_alert?(%Route{id: route_id}, alerts),
     do: Enum.any?(alerts, &Alert.matches_route_and_effect(&1, route_id, :delay))
 
-  # False positive, false negative, or none
-  @type error_type :: :pos | :neg | :none
+  @doc """
+  Display the results of a prediction.
 
-  @spec error(control_result :: boolean(), test_result :: boolean()) :: String.t()
-  def error(control_result, test_result) do
-    control_result
-    |> error_type(test_result)
-    |> error_icon()
+  ## Examples
+
+      <.result actual={true} prediction={false} />
+  """
+  attr(:actual, :boolean)
+  attr(:prediction, :boolean)
+
+  def result(assigns) do
+    ~H"""
+    <div class={if true_result?(@actual, @prediction), do: "text-green-700", else: "text-red-700"}>
+      <%= result_label(@actual, @prediction) %>
+    </div>
+    """
   end
 
-  @spec error_type(control_result :: boolean(), test_result :: boolean()) :: error_type()
-  def error_type(true, false), do: :neg
-  def error_type(false, true), do: :pos
-  def error_type(_, _), do: :none
+  @spec true_result?(boolean(), boolean()) :: boolean()
+  defp true_result?(true, true), do: true
+  defp true_result?(false, false), do: true
+  defp true_result?(_, _), do: false
 
-  @spec error_icon(error_type()) :: String.t()
-  def error_icon(:pos), do: "➕"
-  def error_icon(:neg), do: "➖"
-  def error_icon(:none), do: ""
+  @spec result_label(boolean(), boolean()) :: String.t()
+  defp result_label(true, true), do: "TP"
+  defp result_label(false, false), do: "TN"
+  defp result_label(false, true), do: "FP"
+  defp result_label(true, false), do: "FN"
 
   @type module_option :: {String.t(), module()}
   @spec algorithm_options([module()]) :: [module_option()]

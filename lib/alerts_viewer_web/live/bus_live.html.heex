@@ -66,10 +66,10 @@
       🤖
     </span>
   </:col>
-  <:col :let={route} label="Error">
-    <%= error(
-      Enum.member?(@routes_with_current_alerts, route),
-      Enum.member?(@routes_with_recommended_alerts, route)
-    ) %>
+  <:col :let={route} label="Result">
+    <.result
+      actual={Enum.member?(@routes_with_current_alerts, route)}
+      prediction={Enum.member?(@routes_with_recommended_alerts, route)}
+    />
   </:col>
 </.table>
