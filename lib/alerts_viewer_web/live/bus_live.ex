@@ -29,7 +29,8 @@ defmodule AlertsViewerWeb.BusLive do
         bus_routes: bus_routes,
         stats_by_route: stats_by_route,
         routes_with_current_alerts: routes_with_current_alerts,
-        routes_with_recommended_alerts: []
+        routes_with_recommended_alerts: [],
+        prediction_results: prediction_results(bus_routes, routes_with_current_alerts, [])
       )
 
     {:ok, socket}
@@ -54,7 +55,17 @@ defmodule AlertsViewerWeb.BusLive do
     routes_with_current_alerts =
       Enum.filter(socket.assigns.bus_routes, &delay_alert?(&1, bus_alerts))
 
-    socket = assign(socket, routes_with_current_alerts: routes_with_current_alerts)
+    socket =
+      assign(socket,
+        routes_with_current_alerts: routes_with_current_alerts,
+        prediction_results:
+          prediction_results(
+            socket.assigns.bus_routes,
+            routes_with_current_alerts,
+            socket.assigns.routes_with_recommended_alerts
+          )
+      )
+
     {:noreply, socket}
   end
 
@@ -69,7 +80,17 @@ defmodule AlertsViewerWeb.BusLive do
         {:updated_routes_with_recommended_alerts, routes_with_recommended_alerts},
         socket
       ) do
-    socket = assign(socket, routes_with_recommended_alerts: routes_with_recommended_alerts)
+    socket =
+      assign(socket,
+        routes_with_recommended_alerts: routes_with_recommended_alerts,
+        prediction_results:
+          prediction_results(
+            socket.assigns.bus_routes,
+            socket.assigns.routes_with_current_alerts,
+            routes_with_recommended_alerts
+          )
+      )
+
     {:noreply, socket}
   end
 
@@ -82,29 +103,30 @@ defmodule AlertsViewerWeb.BusLive do
 
   ## Examples
 
-      <.result actual={true} prediction={false} />
+      <.result prediction={false} target={true} />
   """
-  attr(:actual, :boolean)
   attr(:prediction, :boolean)
+  attr(:target, :boolean)
 
   def result(assigns) do
     ~H"""
-    <div class={if true_result?(@actual, @prediction), do: "text-green-700", else: "text-red-700"}>
-      <%= result_label(@actual, @prediction) %>
+    <div class={
+      if PredictionResults.true_result?(@prediction, @target),
+        do: "text-green-700",
+        else: "text-red-700"
+    }>
+      <%= PredictionResults.to_string(@prediction, @target) %>
     </div>
     """
   end
 
-  @spec true_result?(boolean(), boolean()) :: boolean()
-  defp true_result?(true, true), do: true
-  defp true_result?(false, false), do: true
-  defp true_result?(_, _), do: false
+  @spec prediction_results([Route.t()], [Route.t()], [Route.t()]) :: PredictionResults.t()
+  defp prediction_results(routes, routes_with_current_alerts, routes_with_recommended_alerts) do
+    predictions = Enum.map(routes, &Enum.member?(routes_with_recommended_alerts, &1))
+    targets = Enum.map(routes, &Enum.member?(routes_with_current_alerts, &1))
 
-  @spec result_label(boolean(), boolean()) :: String.t()
-  defp result_label(true, true), do: "TP"
-  defp result_label(false, false), do: "TN"
-  defp result_label(false, true), do: "FP"
-  defp result_label(true, false), do: "FN"
+    PredictionResults.new(predictions, targets)
+  end
 
   @type module_option :: {String.t(), module()}
   @spec algorithm_options([module()]) :: [module_option()]
