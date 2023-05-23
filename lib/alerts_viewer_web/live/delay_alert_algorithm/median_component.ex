@@ -1,11 +1,17 @@
-defmodule AlertsViewerWeb.DelayAlertAlgorithms.MedianComponent do
+defmodule AlertsViewer.DelayAlertAlgorithm.MedianComponent do
   @moduledoc """
   Component for controlling the Median delay alert recommendation algorithm.
   """
 
   use AlertsViewerWeb, :live_component
 
+  @behaviour AlertsViewer.DelayAlertAlgorithm
+
   alias Routes.{Route, RouteStats}
+
+  @snapshot_median_min 50
+  @snapshot_median_max 1500
+  @snapshot_median_interval 50
 
   @impl true
   def mount(socket) do
@@ -30,7 +36,7 @@ defmodule AlertsViewerWeb.DelayAlertAlgorithms.MedianComponent do
   @impl true
   def render(assigns) do
     ~H"""
-    <div>
+    <div class="flex space-x-16 items-center">
       <.controls_form phx-change="update-controls" phx-target={@myself}>
         <.input
           type="range"
@@ -44,6 +50,15 @@ defmodule AlertsViewerWeb.DelayAlertAlgorithms.MedianComponent do
           <%= @min_median %>
         </span>
       </.controls_form>
+
+      <.link
+        navigate={~p"/bus/snapshot/#{__MODULE__}"}
+        replace={false}
+        target="_blank"
+        class="bg-transparent hover:bg-zinc-500 text-zinc-700 font-semibold hover:text-white py-2 px-4 border border-zinc-500 hover:border-transparent hover:no-underline rounded"
+      >
+        Snapshot
+      </.link>
     </div>
     """
   end
@@ -61,6 +76,24 @@ defmodule AlertsViewerWeb.DelayAlertAlgorithms.MedianComponent do
     send(self(), {:updated_routes_with_recommended_alerts, routes_with_recommended_alerts})
 
     {:noreply, assign(socket, min_median: min_median)}
+  end
+
+  @impl true
+  def snapshot(routes, stats_by_route) do
+    @snapshot_median_min..@snapshot_median_max//@snapshot_median_interval
+    |> Enum.to_list()
+    |> Enum.map(fn median ->
+      routes_with_recommended_alerts =
+        Enum.filter(
+          routes,
+          &recommending_alert?(&1, stats_by_route, median)
+        )
+
+      [
+        parameters: %{median: median},
+        routes_with_recommended_alerts: routes_with_recommended_alerts
+      ]
+    end)
   end
 
   @spec recommending_alert?(Route.t(), RouteStats.stats_by_route(), non_neg_integer()) ::
