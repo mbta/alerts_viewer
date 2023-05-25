@@ -42,8 +42,8 @@ defmodule AlertsViewer.DelayAlertAlgorithm.MedianComponent do
           type="range"
           name="min_median"
           value={@min_median}
-          min="50"
-          max="1500"
+          min={snapshot_median_min()}
+          max={snapshot_median_max()}
           label="Minumum Median"
         />
         <span class="ml-2">
@@ -102,4 +102,7 @@ defmodule AlertsViewer.DelayAlertAlgorithm.MedianComponent do
     median = RouteStats.median_schedule_adherence(stats_by_route, route)
     !is_nil(median) and median >= min_median
   end
+
+  defp snapshot_median_min, do: @snapshot_median_min
+  defp snapshot_median_max, do: @snapshot_median_max
 end
