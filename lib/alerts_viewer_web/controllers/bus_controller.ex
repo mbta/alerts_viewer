@@ -12,10 +12,10 @@ defmodule AlertsViewerWeb.BusController do
     bus_alerts = Alerts.all()
     routes_with_current_alerts = Enum.filter(bus_routes, &delay_alert?(&1, bus_alerts))
 
-    algoritm_data = mod.snapshot(bus_routes, stats_by_route)
+    algorithm_data = mod.snapshot(bus_routes, stats_by_route)
 
     data =
-      algoritm_data
+      algorithm_data
       |> Enum.map(fn [
                        parameters: parameters,
                        routes_with_recommended_alerts: routes_with_recommended_alerts
@@ -39,7 +39,7 @@ defmodule AlertsViewerWeb.BusController do
         "Accuracy",
         "Recall",
         "Precision"
-      ] ++ parameter_names(algoritm_data)
+      ] ++ parameter_names(algorithm_data)
 
     data = [header_row | data]
 
