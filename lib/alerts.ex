@@ -49,7 +49,8 @@ defmodule Alerts do
           route_id => [
             %{
               severity: alert.severity,
-              created_at: alert.created_at
+              created_at: alert.created_at,
+              id: alert.id
             }
           ]
         })

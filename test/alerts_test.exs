@@ -160,4 +160,51 @@ defmodule AlertsTest do
       assert Alerts.search([foo_alert, bar_alert], "foo") == [foo_alert]
     end
   end
+
+  describe "by_route/1" do
+    test "returns map of alerts keyed on route id" do
+      now = DateTime.now!("America/New_York")
+
+      alert1 = %Alert{
+        id: 1,
+        severity: 3,
+        created_at: now,
+        informed_entity: [
+          %{route: "28", route_type: 3},
+          %{route: "29", route_type: 3}
+        ]
+      }
+
+      alert2 = %Alert{
+        id: 2,
+        severity: 4,
+        created_at: now,
+        informed_entity: [
+          %{route: "29", route_type: 3}
+        ]
+      }
+
+      alert3 = %Alert{
+        id: 3,
+        severity: 5,
+        created_at: now,
+        informed_entity: [
+          %{route: "30", route_type: 3}
+        ]
+      }
+
+      expected = %{
+        "28" => [%{severity: 3, created_at: now, id: alert1.id}],
+        "29" => [
+          %{severity: 4, created_at: now, id: alert2.id},
+          %{severity: 3, created_at: now, id: alert1.id}
+        ],
+        "30" => [%{severity: 5, created_at: now, id: alert3.id}]
+      }
+
+      actual = Alerts.by_route([alert1, alert2, alert3])
+
+      assert expected == actual
+    end
+  end
 end
