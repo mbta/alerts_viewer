@@ -41,21 +41,20 @@ defmodule Alerts do
   Return a map with route ids as string keys and a list of alerts as the value
   """
   @spec by_route([Alert.t()]) :: map()
-  def by_route(bus_alerts) do
-    Enum.reduce(bus_alerts, %{}, fn alert, acc ->
-      Enum.map(alert.informed_entity, & &1.route)
-      |> Enum.reduce(%{}, fn route_id, route_ids_acc ->
-        Map.merge(route_ids_acc, %{
-          route_id => [
-            %{
-              severity: alert.severity,
-              created_at: alert.created_at,
-              id: alert.id
-            }
-          ]
-        })
-      end)
-      |> Map.merge(acc, fn _k, route_ids_map, acc ->
+  def by_route(alerts) do
+    alerts
+    |> Enum.filter(&Enum.any?(&1.informed_entity, fn ie -> !is_nil(ie.route) end))
+    |> Enum.reduce(%{}, fn alert, acc ->
+      routes = Enum.map(alert.informed_entity, & &1.route)
+
+      alert_by_route_id =
+        Enum.reduce(routes, %{}, fn route_id, route_ids_acc ->
+          Map.merge(route_ids_acc, %{
+            route_id => [alert]
+          })
+        end)
+
+      Map.merge(alert_by_route_id, acc, fn _k, route_ids_map, acc ->
         route_ids_map ++ acc
       end)
     end)

@@ -128,18 +128,13 @@ defmodule AlertsViewerWeb.BusLive do
   end
 
   def severity_to_minutes(severity) when severity < 3, do: "<10"
+  def severity_to_minutes(3), do: "10"
+  def severity_to_minutes(4), do: "15"
+  def severity_to_minutes(5), do: "20"
+  def severity_to_minutes(6), do: "25"
+  def severity_to_minutes(7), do: "30"
+  def severity_to_minutes(8), do: "30+"
   def severity_to_minutes(severity) when severity >= 9, do: "60+"
-
-  def severity_to_minutes(severity) do
-    %{
-      3 => "10",
-      4 => "15",
-      5 => "20",
-      6 => "25",
-      7 => "30",
-      8 => "30+"
-    }[severity]
-  end
 
   @spec seconds_to_minutes(nil | number) :: nil | float
   def seconds_to_minutes(nil), do: nil

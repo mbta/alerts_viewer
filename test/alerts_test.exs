@@ -193,16 +193,25 @@ defmodule AlertsTest do
         ]
       }
 
-      expected = %{
-        "28" => [%{severity: 3, created_at: now, id: alert1.id}],
-        "29" => [
-          %{severity: 4, created_at: now, id: alert2.id},
-          %{severity: 3, created_at: now, id: alert1.id}
-        ],
-        "30" => [%{severity: 5, created_at: now, id: alert3.id}]
+      secret_evil_alert = %Alert{
+        id: 3,
+        severity: nil,
+        created_at: nil,
+        informed_entity: [
+          %{route: nil, route_type: nil}
+        ]
       }
 
-      actual = Alerts.by_route([alert1, alert2, alert3])
+      expected = %{
+        "28" => [alert1],
+        "29" => [
+          alert2,
+          alert1
+        ],
+        "30" => [alert3]
+      }
+
+      actual = Alerts.by_route([alert1, alert2, alert3, secret_evil_alert])
 
       assert expected == actual
     end
