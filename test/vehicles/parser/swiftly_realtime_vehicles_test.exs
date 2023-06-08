@@ -54,7 +54,9 @@ defmodule Vehicles.Parser.SwiftlyRealtimeVehiclesTest do
         },
         "directionId" => "0",
         "tripId" => "39998535",
-        "blockId" => "B36-173"
+        "blockId" => "B36-173",
+        "headwaySecs" => 2889.665,
+        "scheduledHeadwaySecs" => 2340
       }
 
       expected =
@@ -64,6 +66,7 @@ defmodule Vehicles.Parser.SwiftlyRealtimeVehiclesTest do
           block_id: "B36-173",
           direction_id: 0,
           headsign: "Forest Hills",
+          headway_secs: 2889.665,
           last_updated: 1_559_672_827,
           latitude: 42.31914,
           layover_departure_time: 1_559_673_780,
@@ -77,6 +80,7 @@ defmodule Vehicles.Parser.SwiftlyRealtimeVehiclesTest do
           run_id: "122-1065",
           schedule_adherence_secs: 0,
           schedule_adherence_string: "0.0 sec (ontime)",
+          scheduled_headway_secs: 2340,
           speed: 11,
           stop_id: "23391",
           stop_name: "Back Bay",
