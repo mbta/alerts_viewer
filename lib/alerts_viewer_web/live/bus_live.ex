@@ -6,15 +6,16 @@ defmodule AlertsViewerWeb.BusLive do
 
   alias Alerts.Alert
   alias AlertsViewer.DelayAlertAlgorithm
+  alias AlertsViewer.DelayAlertAlgorithm.AlgorithmComponent
   alias Routes.{Route, RouteStats, RouteStatsPubSub}
 
   @impl true
   def mount(_params, _session, socket) do
-    delay_alert_algorithm_components =
-      Application.get_env(:alerts_viewer, :delay_alert_algorithm_components)
+    delay_alert_algorithms = Application.get_env(:alerts_viewer, :delay_alert_algorithms)
 
-    algorithm_options = algorithm_options(delay_alert_algorithm_components)
-    current_algorithm = hd(delay_alert_algorithm_components)
+    algorithm_options = algorithm_options(delay_alert_algorithms)
+
+    current_algorithm = hd(delay_alert_algorithms)
 
     bus_routes = Routes.all_bus_routes()
     bus_alerts = if(connected?(socket), do: Alerts.subscribe() |> filtered_by_bus(), else: [])
@@ -43,6 +44,13 @@ defmodule AlertsViewerWeb.BusLive do
   @impl true
   def handle_event("select-algorithm", %{"algorithm" => module_str}, socket) do
     current_algorithm = String.to_atom(module_str)
+
+    send_update(AlgorithmComponent,
+      id: :algorithm_controls,
+      value_set_at: :reset,
+      current_algorithm: current_algorithm
+    )
+
     {:noreply, assign(socket, current_algorithm: current_algorithm)}
   end
 
@@ -161,7 +169,8 @@ defmodule AlertsViewerWeb.BusLive do
   defp algorithm_options(modules), do: Enum.map(modules, &module_lable_tuple/1)
 
   @spec module_lable_tuple(module()) :: module_option()
-  defp module_lable_tuple(module), do: {DelayAlertAlgorithm.humane_name(module), module}
+  defp module_lable_tuple(module),
+    do: {DelayAlertAlgorithm.humane_name(module), module}
 
   @spec filtered_by_bus([Alert.t()]) :: [Alert.t()]
   defp filtered_by_bus(alerts), do: Alerts.by_service(alerts, "3")

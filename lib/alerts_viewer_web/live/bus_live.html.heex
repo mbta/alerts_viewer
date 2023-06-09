@@ -14,10 +14,11 @@
   </.controls_form>
 
   <.live_component
-    module={@current_algorithm}
+    module={AlertsViewer.DelayAlertAlgorithm.AlgorithmComponent}
     id={:algorithm_controls}
     routes={@bus_routes}
     stats_by_route={@stats_by_route}
+    current_algorithm={@current_algorithm}
   />
 </div>
 
