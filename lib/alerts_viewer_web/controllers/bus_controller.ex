@@ -3,27 +3,16 @@ defmodule AlertsViewerWeb.BusController do
 
   alias Alerts.Alert
   alias AlertsViewer.DelayAlertAlgorithm
-  alias AlertsViewer.DelayAlertAlgorithm.AlgorithmComponent
-  alias Routes.{Route, RouteStats, RouteStatsPubSub}
+  alias Routes.{Route, RouteStatsPubSub}
 
-  @type delay_algorithm_snapshot_data_point :: [
-          parameters: map(),
-          routes_with_recommended_alerts: [Route.t()]
-        ]
-  @type delay_algorithm_snapshot_data :: [delay_algorithm_snapshot_data_point()]
-
-  def snapshot(conn, %{"algorithm_module" => algorithm_module}) do
+  def snapshot(conn, %{"algorithm" => algorithm}) do
+    mod = String.to_existing_atom(algorithm)
     bus_routes = Routes.all_bus_routes()
     stats_by_route = RouteStatsPubSub.all()
     bus_alerts = Alerts.all()
     routes_with_current_alerts = Enum.filter(bus_routes, &delay_alert?(&1, bus_alerts))
 
-    algorithm_data =
-      snapshot_stats(
-        bus_routes,
-        stats_by_route,
-        String.to_existing_atom(algorithm_module)
-      )
+    algorithm_data = mod.snapshot(bus_routes, stats_by_route)
 
     data =
       algorithm_data
@@ -58,38 +47,9 @@ defmodule AlertsViewerWeb.BusController do
     |> put_resp_content_type("text/csv")
     |> put_resp_header(
       "content-disposition",
-      "attachment; filename=\"#{csv_file_name(DelayAlertAlgorithm.humane_name(algorithm_module))}\""
+      "attachment; filename=\"#{csv_file_name(algorithm)}\""
     )
     |> send_resp(200, csv_content(data))
-  end
-
-  @spec snapshot_stats([Route.t()], RouteStats.stats_by_route(), atom) ::
-          delay_algorithm_snapshot_data()
-  def snapshot_stats(routes, stats_by_route, algorithm_module) do
-    algorithm_module.min_value()..algorithm_module.max_value()//algorithm_module.interval_value()
-    |> Enum.to_list()
-    |> Enum.map(fn value ->
-      routes_with_recommended_alerts =
-        Enum.filter(
-          routes,
-          &AlgorithmComponent.recommending_alert?(
-            &1,
-            stats_by_route,
-            value,
-            algorithm_module.algorithm()
-          )
-        )
-
-      [
-        parameters:
-          Map.put(
-            %{},
-            String.to_atom(DelayAlertAlgorithm.humane_name(algorithm_module)),
-            value
-          ),
-        routes_with_recommended_alerts: routes_with_recommended_alerts
-      ]
-    end)
   end
 
   @spec delay_alert?(Route.t(), [Alert.t()]) :: boolean()

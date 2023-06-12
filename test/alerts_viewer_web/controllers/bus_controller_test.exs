@@ -26,7 +26,7 @@ defmodule AlertsViewerWeb.BusControllerTest do
         Conn.send_resp(conn, 200, ~s({"data": []}))
       end)
 
-      conn = get(conn, ~p"/bus/snapshot/Elixir.AlertsViewer.DelayAlertAlgorithm.Median")
+      conn = get(conn, ~p"/bus/snapshot/Elixir.AlertsViewer.DelayAlertAlgorithm.MedianComponent")
 
       assert res = response(conn, 200)
 
