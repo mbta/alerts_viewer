@@ -17,6 +17,7 @@ defmodule Vehicles.Vehicle do
     :run_id,
     :schedule_adherence_secs,
     :schedule_adherence_string,
+    :scheduled_headway_secs,
     :instantaneous_headway_secs,
     :trip_id
   ]
@@ -36,6 +37,7 @@ defmodule Vehicles.Vehicle do
           run_id: String.t(),
           schedule_adherence_secs: integer(),
           schedule_adherence_string: String.t(),
+          scheduled_headway_secs: integer() | nil,
           instantaneous_headway_secs: integer() | nil,
           trip_id: String.t()
         }
@@ -53,6 +55,7 @@ defmodule Vehicles.Vehicle do
       run_id: vehicle_position.run_id,
       schedule_adherence_secs: round(vehicle_position.schedule_adherence_secs),
       schedule_adherence_string: vehicle_position.schedule_adherence_string,
+      scheduled_headway_secs: rounded_or_nil(vehicle_position.scheduled_headway_secs),
       instantaneous_headway_secs: rounded_or_nil(vehicle_position.headway_secs),
       trip_id: vehicle_position.trip_id
     }
@@ -117,5 +120,22 @@ defmodule Vehicles.Vehicle do
       do: instantaneous_headway_secs
 
   def instantaneous_headway_secs(_),
+    do: nil
+
+  @doc """
+  Returns the scheduled headway in seconds for the vehicle.
+
+  iex> Vehicle.scheduled_headway_secs(%Vehicle{scheduled_headway_secs: 22})
+  22
+  iex> Vehicle.scheduled_headway_secs(%Vehicle{})
+  nil
+  """
+  @spec scheduled_headway_secs(t()) :: integer() | nil
+  def scheduled_headway_secs(%__MODULE__{
+        scheduled_headway_secs: scheduled_headway_secs
+      }),
+      do: scheduled_headway_secs
+
+  def scheduled_headway_secs(_),
     do: nil
 end
