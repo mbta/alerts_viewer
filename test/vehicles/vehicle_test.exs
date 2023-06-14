@@ -18,6 +18,7 @@ defmodule Vehicles.VehicleTest do
     layover_departure_time: nil,
     schedule_adherence_secs: 59,
     schedule_adherence_string: "59.0 sec (late)",
+    headway_secs: 22,
     speed: 0.0,
     stop_id: "392",
     trip_id: "39984755",
@@ -38,6 +39,7 @@ defmodule Vehicles.VehicleTest do
                run_id: "138-1038",
                schedule_adherence_secs: 59,
                schedule_adherence_string: "59.0 sec (late)",
+               instantaneous_headway_secs: 22,
                trip_id: "39984755"
              }
     end
