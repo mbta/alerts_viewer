@@ -1,4 +1,4 @@
-defmodule AlertsViewer.DelayAlertAlgorithm.MedianAndStandardDeviationComponent do
+defmodule AlertsViewer.DelayAlertAlgorithm.MedianAndStandardDeviationAdherenceComponent do
   @moduledoc """
   Component for controlling the standard deviation and median delay alert recommendation algorithm.
   """
