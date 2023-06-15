@@ -15,8 +15,8 @@ config :alerts_viewer,
   api_key: {:system, "API_KEY"},
   api_cache_size: 10_000,
   delay_alert_algorithm_components: [
-    AlertsViewer.DelayAlertAlgorithm.MedianComponent,
-    AlertsViewer.DelayAlertAlgorithm.StandardDeviationComponent,
+    AlertsViewer.DelayAlertAlgorithm.MedianAdherenceComponent,
+    AlertsViewer.DelayAlertAlgorithm.StandardDeviationAdherenceComponent,
     AlertsViewer.DelayAlertAlgorithm.MedianAndStandardDeviationComponent
   ],
   swiftly_authorization_key: {:system, "SWIFTLY_AUTHORIZATION_KEY"},
