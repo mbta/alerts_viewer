@@ -1,4 +1,4 @@
-defmodule AlertsViewer.DelayAlertAlgorithm.OneSliderComponent do
+defmodule AlertsViewer.DelayAlertAlgorithm.BaseAlgorithmComponents.OneSliderComponent do
   defmacro __using__(_opts) do
     quote do
       @moduledoc """

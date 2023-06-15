@@ -1,5 +1,5 @@
 defmodule AlertsViewer.DelayAlertAlgorithm.MedianAdherenceComponent do
-  use AlertsViewer.DelayAlertAlgorithm.OneSliderComponent
+  use AlertsViewer.DelayAlertAlgorithm.BaseAlgorithmComponents.OneSliderComponent
 
   @moduledoc """
   Component for controlling the Median delay alert recommendation algorithm.

@@ -1,5 +1,5 @@
 defmodule AlertsViewer.DelayAlertAlgorithm.StandardDeviationInstantaneousHeadwayComponent do
-  use AlertsViewer.DelayAlertAlgorithm.OneSliderComponent
+  use AlertsViewer.DelayAlertAlgorithm.BaseAlgorithmComponents.OneSliderComponent
 
   @moduledoc """
   Component for controlling the standard deviation delay alert recommendation algorithm.
