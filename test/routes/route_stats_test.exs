@@ -21,10 +21,10 @@ defmodule Routes.RouteStatsTest do
 
       assert RouteStats.from_vehicles("66", vehicles) == %RouteStats{
                id: "66",
-               vehicles_schedule_adherence_secs: [20, 10],
-               vehicles_instantaneous_headway_secs: [1000, 500],
-               vehicles_scheduled_headway_secs: [80, 40],
-               vehicles_instantaneous_minus_scheduled_headway_secs: [920, 460]
+               vehicles_schedule_adherence_secs: [10, 20],
+               vehicles_instantaneous_headway_secs: [500, 1000],
+               vehicles_scheduled_headway_secs: [40, 80],
+               vehicles_instantaneous_minus_scheduled_headway_secs: [460, 920]
              }
     end
   end

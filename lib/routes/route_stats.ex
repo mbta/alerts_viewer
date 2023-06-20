@@ -231,59 +231,38 @@ defmodule Routes.RouteStats do
 
   @spec schedule_adherence_secs_of_vehicles([Vehicle.t()]) :: [integer()]
   defp schedule_adherence_secs_of_vehicles(vehicles) do
-    Enum.reduce(vehicles, [], fn vehicle, acc ->
-      case Vehicle.schedule_adherence_secs(vehicle) do
-        nil ->
-          acc
-
-        secs ->
-          [secs | acc]
-      end
-    end)
+    map_and_remove_nils(vehicles, &Vehicle.schedule_adherence_secs/1)
   end
 
   @spec instantaneous_headway_secs_of_vehicles([Vehicle.t()]) :: [integer()]
   defp instantaneous_headway_secs_of_vehicles(vehicles) do
-    Enum.reduce(vehicles, [], fn vehicle, acc ->
-      case Vehicle.instantaneous_headway_secs(vehicle) do
-        nil ->
-          acc
-
-        secs ->
-          [secs | acc]
-      end
-    end)
+    map_and_remove_nils(vehicles, &Vehicle.instantaneous_headway_secs/1)
   end
 
   @spec scheduled_headway_secs_of_vehicles([Vehicle.t()]) :: [integer()]
   defp scheduled_headway_secs_of_vehicles(vehicles) do
-    Enum.reduce(vehicles, [], fn vehicle, acc ->
-      case Vehicle.scheduled_headway_secs(vehicle) do
-        nil ->
-          acc
-
-        secs ->
-          [secs | acc]
-      end
-    end)
+    map_and_remove_nils(vehicles, &Vehicle.scheduled_headway_secs/1)
   end
 
   @spec instantaneous_minus_scheduled_headway_secs_of_vehicles([Vehicle.t()]) :: [integer()]
   defp instantaneous_minus_scheduled_headway_secs_of_vehicles(vehicles) do
-    Enum.reduce(vehicles, [], fn vehicle, acc ->
+    Enum.reject(
+      vehicles,
+      &(is_nil(Vehicle.scheduled_headway_secs(&1)) or
+          is_nil(Vehicle.instantaneous_headway_secs(&1)))
+    )
+    |> Enum.reduce([], fn vehicle, acc ->
       scheduled_secs = Vehicle.scheduled_headway_secs(vehicle)
-
       instantaneous_secs = Vehicle.instantaneous_headway_secs(vehicle)
 
-      case is_nil(scheduled_secs) or is_nil(instantaneous_secs) do
-        true ->
-          acc
-
-        false ->
-          secs = instantaneous_secs - scheduled_secs
-          [secs | acc]
-      end
+      [instantaneous_secs - scheduled_secs | acc]
     end)
+    |> Enum.reverse()
+  end
+
+  defp map_and_remove_nils(vehicles, function) do
+    Enum.map(vehicles, &function.(&1))
+    |> Enum.reject(&is_nil(&1))
   end
 
   @spec round_to_1_place(number() | nil) :: number() | nil

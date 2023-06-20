@@ -4,6 +4,7 @@ defmodule AlertsViewer.DelayAlertAlgorithm.MedianAndStandardDeviationAdherenceCo
   """
 
   use AlertsViewerWeb, :live_component
+  alias AlertsViewer.DelayAlertAlgorithm.BaseAlgorithmComponents.SnapshotButtonComponent
 
   @behaviour AlertsViewer.DelayAlertAlgorithm
 
@@ -70,15 +71,7 @@ defmodule AlertsViewer.DelayAlertAlgorithm.MedianAndStandardDeviationAdherenceCo
           <%= @min_std_val %>
         </span>
       </.controls_form>
-
-      <.link
-        navigate={~p"/bus/snapshot/#{__MODULE__}"}
-        replace={false}
-        target="_blank"
-        class="bg-transparent hover:bg-zinc-500 text-zinc-700 font-semibold hover:text-white py-2 px-4 border border-zinc-500 hover:border-transparent hover:no-underline rounded"
-      >
-        Snapshot
-      </.link>
+      <SnapshotButtonComponent.snapshot_button module_name={__MODULE__} />
     </div>
     """
   end

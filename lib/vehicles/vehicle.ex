@@ -61,8 +61,8 @@ defmodule Vehicles.Vehicle do
     }
   end
 
-  def rounded_or_nil(nil), do: nil
-  def rounded_or_nil(secs) when is_number(secs), do: round(secs)
+  defp rounded_or_nil(nil), do: nil
+  defp rounded_or_nil(secs) when is_number(secs), do: round(secs)
 
   @doc """
   Returns whether or noth the vehicle has a route ID.

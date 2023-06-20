@@ -22,21 +22,8 @@ defmodule AlertsViewer.DelayAlertAlgorithm.StandardDeviationAdherenceComponent d
           <%= @min_value %>
         </span>
       </.controls_form>
-      <%= snapshot_button(assigns) %>
+      <SnapshotButtonComponent.snapshot_button module_name={__MODULE__} />
     </div>
-    """
-  end
-
-  def snapshot_button(assigns) do
-    ~H"""
-    <.link
-      navigate={~p"/bus/snapshot/#{__MODULE__}"}
-      replace={false}
-      target="_blank"
-      class="bg-transparent hover:bg-zinc-500 text-zinc-700 font-semibold hover:text-white py-2 px-4 border border-zinc-500 hover:border-transparent hover:no-underline rounded"
-    >
-      Snapshot
-    </.link>
     """
   end
 
