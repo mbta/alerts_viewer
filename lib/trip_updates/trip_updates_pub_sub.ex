@@ -7,6 +7,10 @@ defmodule TripUpdates.TripUpdatesPubSub do
 
   defstruct block_waivered_routes: []
 
+  @type t :: %__MODULE__{
+          block_waivered_routes: [String.t()]
+        }
+
   # Client
 
   @spec start_link() :: GenServer.on_start()
@@ -21,7 +25,7 @@ defmodule TripUpdates.TripUpdatesPubSub do
     )
   end
 
-  @spec subscribe(atom | pid | {atom, any} | {:via, atom, any}) :: any
+  @spec subscribe(atom | pid | {atom, any} | {:via, atom, any}) :: __MODULE__.t()
   def subscribe(server \\ __MODULE__) do
     {registry_key, block_waivered_routes} = GenServer.call(server, :subscribe)
     Registry.register(:trip_updates_subscriptions_registry, registry_key, :value_does_not_matter)

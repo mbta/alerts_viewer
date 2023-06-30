@@ -21,7 +21,7 @@ defmodule TripUpdates.Parser.GTFSRealtimeEnhanced do
 
   defp decode_feed_entity(_), do: []
 
-  @spec decode_trip_update(map) :: [struct, ...]
+  @spec decode_trip_update(map) :: [TripUpdate.t()]
   def decode_trip_update(trip_update) do
     trip = decode_trip(Map.get(trip_update, "trip"))
 
@@ -55,7 +55,7 @@ defmodule TripUpdates.Parser.GTFSRealtimeEnhanced do
     )
   end
 
-  @spec decode_trip(nil | map) :: nil | struct
+  @spec decode_trip(nil | map) :: nil | Trip.t()
   defp decode_trip(nil), do: nil
 
   defp decode_trip(trip) do

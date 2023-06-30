@@ -15,8 +15,8 @@ defmodule AlertsViewer.Application do
           Alerts.Supervisor,
           Routes.Supervisor,
           Vehicles.Supervisor,
-          TripUpdates.GTFSSupervisor,
-          TripUpdates.Supervisor
+          TripUpdates.Supervisor,
+          TripUpdates.GTFSSupervisor
         ]
       else
         []

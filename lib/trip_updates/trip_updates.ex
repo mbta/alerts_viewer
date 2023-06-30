@@ -24,7 +24,8 @@ defmodule TripUpdates.TripUpdates do
 
   @impl GenStage
   def handle_events(events, _from, state) do
-    List.last(events)
+    events
+    |> List.last()
     |> TripUpdatesPubSub.update_block_waivered_routes()
 
     {:noreply, [], state}

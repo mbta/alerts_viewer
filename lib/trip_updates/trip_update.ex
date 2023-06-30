@@ -17,8 +17,8 @@ defmodule TripUpdates.TripUpdate do
   @type t :: %__MODULE__{
           start_date: integer() | nil,
           start_time: integer() | nil,
-          trip: Trip,
-          stop_time_update: [StopTimeUpdate],
+          trip: Trip.t(),
+          stop_time_update: [StopTimeUpdate.t()],
           timestamp: integer() | nil
         }
 
