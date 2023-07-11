@@ -636,15 +636,9 @@ defmodule AlertsViewerWeb.CoreComponents do
   end
 
   @doc """
-  Renders a date-time in Eastern time using human-friendly formatting.
+  Renders a date-time using human-friendly formatting.
   """
   attr(:date_time, :map, required: true)
-
-  def date_time(%{date_time: %DateTime{}} = assigns) do
-    ~H"""
-    <%= friendly_date_time(@date_time |> DateTime.shift_zone!("America/New_York")) %>
-    """
-  end
 
   def date_time(assigns) do
     ~H"""
