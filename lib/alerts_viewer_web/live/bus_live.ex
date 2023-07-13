@@ -64,7 +64,7 @@ defmodule AlertsViewerWeb.BusLive do
 
   @impl true
   def handle_info({:alerts, alerts}, socket) do
-    bus_alerts = filtered_by_bus(alerts)
+    bus_alerts = filtered_by_bus(alerts) |> filtered_by_delay_type()
 
     routes_with_current_alerts =
       Enum.filter(socket.assigns.bus_routes, &delay_alert?(&1, bus_alerts))
