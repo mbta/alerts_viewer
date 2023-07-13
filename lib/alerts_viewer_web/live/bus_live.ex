@@ -163,7 +163,7 @@ defmodule AlertsViewerWeb.BusLive do
   def display_minutes(assigns) do
     list_of_minutes =
       assigns.stats_by_route
-      |> RouteStats.vehicles_instantaneous_headway_secs(assigns.route)
+      |> assigns.stats_function.(assigns.route)
       |> Enum.sort(:desc)
       |> Enum.map(&seconds_to_minutes/1)
 

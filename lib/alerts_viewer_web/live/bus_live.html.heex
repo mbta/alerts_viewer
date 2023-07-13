@@ -72,13 +72,25 @@
     <%= Route.name(route) %>
   </:col>
   <:col :let={route} label="Individual Vehicle Schedule Adherence (minutes)">
-    <.display_minutes route={route} stats_by_route={@stats_by_route} />
+    <.display_minutes
+      route={route}
+      stats_by_route={@stats_by_route}
+      stats_function={&RouteStats.vehicles_schedule_adherence_secs/2}
+    />
   </:col>
   <:col :let={route} label="Individual Vehicle Instantaneous Headway (minutes)">
-    <.display_minutes route={route} stats_by_route={@stats_by_route} />
+    <.display_minutes
+      route={route}
+      stats_by_route={@stats_by_route}
+      stats_function={&RouteStats.vehicles_instantaneous_headway_secs/2}
+    />
   </:col>
   <:col :let={route} label="Individual Vehicle Instantaneous - Scheduled Headway (minutes)">
-    <.display_minutes route={route} stats_by_route={@stats_by_route} />
+    <.display_minutes
+      route={route}
+      stats_by_route={@stats_by_route}
+      stats_function={&RouteStats.vehicles_instantaneous_minus_scheduled_headway_secs/2}
+    />
   </:col>
   <:col :let={route} label="Median Schedule Adherence (minutes)">
     <%= RouteStats.median_schedule_adherence(@stats_by_route, route) |> seconds_to_minutes() %>
