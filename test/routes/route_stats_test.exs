@@ -126,6 +126,26 @@ defmodule Routes.RouteStatsTest do
     end
   end
 
+  describe "max_schedule_adherence" do
+    test "returns the median schedule adherence for all vehicles" do
+      route_stats = %RouteStats{id: "1", vehicles_schedule_adherence_secs: [1, 2, 3]}
+
+      assert RouteStats.max_schedule_adherence(route_stats) == 3
+    end
+
+    test "returns nil if no vehicles_schedule_adherence_secs values" do
+      route_stats = %RouteStats{id: "1", vehicles_schedule_adherence_secs: []}
+
+      assert RouteStats.max_schedule_adherence(route_stats) == nil
+    end
+
+    test "accepts stats_by_route and a route" do
+      stats_by_route = %{"1" => %RouteStats{id: "1", vehicles_schedule_adherence_secs: [1, 2, 3]}}
+
+      assert RouteStats.max_schedule_adherence(stats_by_route, %Route{id: "1"}) == 3
+    end
+  end
+
   describe "standard_deviation_of_schedule_adherence rounded to 1 place" do
     test "" do
       route_stats = %RouteStats{id: "1", vehicles_schedule_adherence_secs: [1, 2]}

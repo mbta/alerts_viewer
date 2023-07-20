@@ -92,6 +92,20 @@ defmodule Routes.RouteStats do
   end
 
   ############# Algorithms for Schedule Adherence
+  @spec max_schedule_adherence(t()) :: number() | nil
+  @spec max_schedule_adherence(stats_by_route(), Route.t()) :: number() | nil
+  def max_schedule_adherence(route_stats) do
+    route_stats
+    |> vehicles_schedule_adherence_secs()
+    |> Enum.max(fn -> nil end)
+  end
+
+  def max_schedule_adherence(stats_by_route, route) do
+    stats_by_route
+    |> stats_for_route(route)
+    |> max_schedule_adherence()
+  end
+
   @spec median_schedule_adherence(t()) :: number() | nil
   @spec median_schedule_adherence(stats_by_route(), Route.t()) :: number() | nil
   def median_schedule_adherence(route_stats) do
