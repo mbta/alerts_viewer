@@ -28,6 +28,8 @@ defmodule AlertsViewerWeb.Router do
 
     live "/bus", BusLive
     get "/bus/snapshot/:algorithm", BusController, :snapshot
+
+    live "/stop_alerts", StopAlertsLive
   end
 
   # Other scopes may use custom stacks.

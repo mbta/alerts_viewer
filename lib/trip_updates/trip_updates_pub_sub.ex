@@ -41,9 +41,10 @@ defmodule TripUpdates.TripUpdatesPubSub do
   def update_block_waivered_routes(trip_updates, server \\ __MODULE__) do
     # puts into state a list of routes which have gotten a trip update
     # where all the stop updates have a cancellation reason
+
     block_waivered_routes =
       trip_updates
-      |> Enum.filter(&are_all_cancelled?(&1))
+      |> Enum.filter(&(are_all_cancelled?(&1) and is_it_fresh?(&1)))
       |> Enum.group_by(& &1.trip.route_id)
       |> Map.keys()
 
@@ -102,5 +103,26 @@ defmodule TripUpdates.TripUpdatesPubSub do
     Enum.all?(trip_update.stop_time_update, fn update ->
       StopTimeUpdate.is_block_waiver?(update)
     end)
+  end
+
+  def is_it_fresh?(trip_update, current_time \\ DateTime.now!("America/New_York")) do
+    # returns false if the latest time of a
+    # stop update departure with in it
+    # is over two hours old
+    # and the current time is between noon
+    # and midnight.
+    case current_time.hour <= 12 do
+      true ->
+        true
+
+      false ->
+        most_recent = most_recent_stop_arrival(trip_update)
+        hour_diff = DateTime.diff(current_time, most_recent, :hour)
+        if hour_diff >= 2, do: false, else: true
+    end
+  end
+
+  defp most_recent_stop_arrival(trip_update) do
+    Enum.map(trip_update.stop_time_update, & &1.arrival_time) |> Enum.max(DateTime)
   end
 end
