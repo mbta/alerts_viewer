@@ -106,7 +106,9 @@ defmodule Routes.RouteStats do
     |> max_schedule_adherence()
   end
 
-  @spec median_schedule_adherence(map, binary | Routes.Route.t()) :: nil | number
+  @spec median_schedule_adherence(t()) :: number() | nil
+  @spec median_schedule_adherence(stats_by_route(), String.t()) :: number() | nil
+  @spec median_schedule_adherence(stats_by_route(), Route.t()) :: number() | nil
   def median_schedule_adherence(route_stats) do
     route_stats
     |> vehicles_schedule_adherence_secs()
@@ -144,7 +146,6 @@ defmodule Routes.RouteStats do
   end
 
   ########### Algorithms for Instantaneous_headway
-
   def median_instantaneous_headway(route_stats) do
     route_stats
     |> vehicles_instantaneous_headway_secs()
@@ -258,7 +259,8 @@ defmodule Routes.RouteStats do
   end
 
   ################ Functions to get stats per vehicle
-  @spec stats_for_route(map, binary | Routes.Route.t()) :: any
+  @spec stats_for_route(stats_by_route(), Route.t()) :: t()
+  @spec stats_for_route(stats_by_route(), String.t()) :: t()
   def stats_for_route(stats_by_route, %Route{id: route_id}),
     do: Map.get(stats_by_route, route_id, %__MODULE__{})
 

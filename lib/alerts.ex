@@ -78,6 +78,15 @@ defmodule Alerts do
     end)
   end
 
+  @doc """
+  Duration of alert in hours, to 1 decimal point
+  """
+  @spec alert_duration(Alert.t()) :: float()
+  def alert_duration(alert, current_time \\ DateTime.now!("America/New_York")) do
+    (DateTime.diff(current_time, alert.created_at) / 3600)
+    |> Float.round(1)
+  end
+
   @spec string_value(map(), atom()) :: String.t()
   defp string_value(map, key) do
     case Map.get(map, key) do

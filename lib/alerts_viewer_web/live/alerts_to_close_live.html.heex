@@ -20,6 +20,6 @@
     </span>
   </:col>
   <:col :let={route} label="Alert Duration (hours)">
-    <%= Enum.map(@alerts_by_route[route], &alert_duration(&1)) |> Enum.join(", ") %>
+    <%= Enum.map(@alerts_by_route[route], &Alerts.alert_duration(&1)) |> Enum.join(", ") %>
   </:col>
 </.table>

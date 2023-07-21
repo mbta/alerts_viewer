@@ -31,4 +31,11 @@ defmodule AlertsViewerWeb.DateTimeHelpers do
   defp date_time_format(dt, now) when dt.day == now.day, do: "%-I:%M %p"
   defp date_time_format(dt, now) when dt.year == now.year, do: "%b %-d"
   defp date_time_format(_, _), do: "%b %Y"
+
+  @spec seconds_to_minutes(nil | number) :: nil | float
+  def seconds_to_minutes(nil), do: nil
+
+  def seconds_to_minutes(seconds) do
+    (seconds / 60) |> round
+  end
 end

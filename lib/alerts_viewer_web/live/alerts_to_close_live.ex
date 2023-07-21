@@ -48,18 +48,6 @@ defmodule AlertsViewerWeb.AlertsToCloseLive do
     {:noreply, assign(socket, block_waivered_routes: block_waivered_routes)}
   end
 
-  def alert_duration(alert) do
-    (DateTime.diff(DateTime.now!("America/New_York"), alert.created_at) / 3600)
-    |> Float.round(1)
-  end
-
-  @spec seconds_to_minutes(nil | number) :: nil | float
-  def seconds_to_minutes(nil), do: nil
-
-  def seconds_to_minutes(seconds) do
-    (seconds / 60) |> round
-  end
-
   defp alerts_by_route(alerts) do
     alerts
     |> filtered_by_bus()
