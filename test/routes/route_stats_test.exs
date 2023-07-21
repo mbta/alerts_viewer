@@ -257,6 +257,36 @@ defmodule Routes.RouteStatsTest do
     end
   end
 
+  describe "max_instantaneous_minus_scheduled_headway" do
+    test "returns the max instantaneous minus scheduled headway for all vehicles" do
+      route_stats = %RouteStats{
+        id: "1",
+        vehicles_instantaneous_minus_scheduled_headway_secs: [1, 2, 3]
+      }
+
+      assert RouteStats.max_instantaneous_minus_scheduled_headway(route_stats) == 3
+    end
+
+    test "returns nil if no vehicles_instantaneous_minus_scheduled_headway_secs values" do
+      route_stats = %RouteStats{id: "1", vehicles_instantaneous_minus_scheduled_headway_secs: []}
+
+      assert RouteStats.max_instantaneous_minus_scheduled_headway(route_stats) == nil
+    end
+
+    test "accepts stats_by_route and a route" do
+      stats_by_route = %{
+        "1" => %RouteStats{
+          id: "1",
+          vehicles_instantaneous_minus_scheduled_headway_secs: [1, 2, 3]
+        }
+      }
+
+      assert RouteStats.max_instantaneous_minus_scheduled_headway(stats_by_route, %Route{
+               id: "1"
+             }) == 3
+    end
+  end
+
   describe "median_instantaneous_minus_scheduled_headway" do
     test "returns the median instantaneous minus scheduled headway for all vehicles rounded to 1 place" do
       route_stats = %RouteStats{

@@ -205,6 +205,21 @@ defmodule Routes.RouteStats do
   end
 
   ####### Algorithms for Instantaneous Minus Scheduled Headway
+  @spec max_instantaneous_minus_scheduled_headway(t()) :: number() | nil
+  @spec max_instantaneous_minus_scheduled_headway(stats_by_route(), Route.t()) ::
+          number() | nil
+  def max_instantaneous_minus_scheduled_headway(route_stats) do
+    route_stats
+    |> vehicles_instantaneous_minus_scheduled_headway_secs()
+    |> Enum.max(fn -> nil end)
+  end
+
+  def max_instantaneous_minus_scheduled_headway(stats_by_route, route) do
+    stats_by_route
+    |> stats_for_route(route)
+    |> max_instantaneous_minus_scheduled_headway()
+  end
+
   @spec median_instantaneous_minus_scheduled_headway(t()) :: number() | nil
   @spec median_instantaneous_minus_scheduled_headway(stats_by_route(), Route.t()) ::
           number() | nil
