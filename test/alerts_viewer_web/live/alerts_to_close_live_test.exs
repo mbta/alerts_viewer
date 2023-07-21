@@ -1,4 +1,4 @@
-defmodule AlertsViewerWeb.StopAlertsLiveTest do
+defmodule AlertsViewerWeb.AlertsToCloseLiveTest do
   use ExUnit.Case
   use AlertsViewerWeb.ConnCase
 
@@ -22,7 +22,7 @@ defmodule AlertsViewerWeb.StopAlertsLiveTest do
     end
 
     test "connected mount", %{conn: conn} do
-      {:ok, _view, html} = live(conn, "/stop_alerts")
+      {:ok, _view, html} = live(conn, "/alerts_to_close")
 
       assert html =~ ~r/Alerts/
     end

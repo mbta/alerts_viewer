@@ -3,7 +3,7 @@ defmodule TripUpdates.TripUpdatesPubSub do
   Publish a list of blocked routes to subscribers.
   """
   use GenServer
-  alias TripUpdates.{StopTimeUpdate, TripUpdates}
+  alias TripUpdates.{StopTimeUpdate, TripUpdate, TripUpdates}
 
   defstruct block_waivered_routes: []
 
@@ -25,7 +25,8 @@ defmodule TripUpdates.TripUpdatesPubSub do
     )
   end
 
-  @spec subscribe(atom | pid | {atom, any} | {:via, atom, any}) :: __MODULE__.t()
+  @spec subscribe() :: [TripUpdate.t()]
+  @spec subscribe(GenServer.server()) :: [TripUpdate.t()]
   def subscribe(server \\ __MODULE__) do
     {registry_key, block_waivered_routes} = GenServer.call(server, :subscribe)
     Registry.register(:trip_updates_subscriptions_registry, registry_key, :value_does_not_matter)

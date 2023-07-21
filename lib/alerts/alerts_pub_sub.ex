@@ -30,7 +30,8 @@ defmodule Alerts.AlertsPubSub do
     )
   end
 
-  @spec subscribe(atom | pid | {atom, any} | {:via, atom, any}) :: any
+  @spec subscribe() :: [Alert.t()]
+  @spec subscribe(GenServer.server()) :: [Alert.t()]
   def subscribe(server \\ __MODULE__) do
     {registry_key, alerts} = GenServer.call(server, {:subscribe})
     Registry.register(:alerts_subscriptions_registry, registry_key, :value_does_not_matter)

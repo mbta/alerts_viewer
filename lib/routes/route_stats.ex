@@ -106,6 +106,7 @@ defmodule Routes.RouteStats do
     |> max_schedule_adherence()
   end
 
+  @spec median_schedule_adherence(map, binary | Routes.Route.t()) :: nil | number
   def median_schedule_adherence(route_stats) do
     route_stats
     |> vehicles_schedule_adherence_secs()
@@ -113,7 +114,6 @@ defmodule Routes.RouteStats do
     |> round_to_1_place()
   end
 
-  @spec median_schedule_adherence(map, binary | Routes.Route.t()) :: nil | number
   def median_schedule_adherence(stats_by_route, route_id) when is_binary(route_id) do
     stats_by_route
     |> stats_for_route(route_id)
