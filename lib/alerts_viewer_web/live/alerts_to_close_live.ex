@@ -9,6 +9,12 @@ defmodule AlertsViewerWeb.AlertsToCloseLive do
 
   @impl true
   def mount(_params, _session, socket) do
+    stop_recommendation_algorithm_components =
+      Application.get_env(:alerts_viewer, :stop_recommendation_algorithm_components)
+
+    algorithm_options = algorithm_options(stop_recommendation_algorithm_components)
+    current_algorithm = hd(stop_recommendation_algorithm_components)
+
     bus_alerts =
       if(connected?(socket),
         do: Alerts.subscribe(),
@@ -23,16 +29,18 @@ defmodule AlertsViewerWeb.AlertsToCloseLive do
 
     socket =
       assign(socket,
+        algorithm_options: algorithm_options,
+        current_algorithm: current_algorithm,
         stats_by_route: stats_by_route,
         block_waivered_routes: block_waivered_routes,
-        alerts_by_route: alerts_by_route
+        alerts_by_route: alerts_by_route,
+        routes_with_recommended_closures: []
       )
 
     {:ok, socket}
   end
 
   @impl true
-
   def handle_info({:alerts, alerts}, socket) do
     alerts_by_route = alerts_by_route(alerts)
     {:noreply, assign(socket, alerts_by_route: alerts_by_route)}
@@ -46,6 +54,25 @@ defmodule AlertsViewerWeb.AlertsToCloseLive do
   @impl true
   def handle_info({:block_waivered_routes, block_waivered_routes}, socket) do
     {:noreply, assign(socket, block_waivered_routes: block_waivered_routes)}
+  end
+
+  @impl true
+  def handle_info(
+        {:updated_routes_with_recommended_closures, routes_with_recommended_closures},
+        socket
+      ) do
+    socket =
+      assign(socket,
+        routes_with_recommended_closures: routes_with_recommended_closures
+      )
+
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("select-algorithm", %{"algorithm" => module_str}, socket) do
+    current_algorithm = String.to_atom(module_str)
+    {:noreply, assign(socket, current_algorithm: current_algorithm)}
   end
 
   defp alerts_by_route(alerts) do
@@ -70,4 +97,12 @@ defmodule AlertsViewerWeb.AlertsToCloseLive do
 
   @spec filtered_by_delay_type([Alert.t()]) :: [Alert.t()]
   defp filtered_by_delay_type(alerts), do: Alerts.by_effect(alerts, "delay")
+
+  @type module_option :: {String.t(), module()}
+  @spec algorithm_options([module()]) :: [module_option()]
+  defp algorithm_options(modules), do: Enum.map(modules, &module_lable_tuple/1)
+
+  @spec module_lable_tuple(module()) :: module_option()
+  defp module_lable_tuple(module),
+    do: {AlertsViewer.DelayAlertAlgorithm.humane_name(module), module}
 end
