@@ -10,30 +10,31 @@ defmodule AlertsViewer.Application do
     load_runtime_config()
 
     children =
-      if Application.get_env(:alerts_viewer, :start_data_processes) do
-        [
-          Alerts.Supervisor,
-          Routes.Supervisor,
-          Vehicles.Supervisor,
-          TripUpdates.Supervisor,
-          TripUpdates.GTFSSupervisor
-        ]
-      else
-        []
-      end ++
-        [
-          Api.Cache,
-          # Start the Telemetry supervisor
-          AlertsViewerWeb.Telemetry,
-          # Start the PubSub system
-          {Phoenix.PubSub, name: AlertsViewer.PubSub},
-          # Start Finch
-          {Finch, name: AlertsViewer.Finch},
-          # Start the Endpoint (http/https)
-          AlertsViewerWeb.Endpoint
-          # Start a worker by calling: AlertsViewer.Worker.start_link(arg)
-          # {AlertsViewer.Worker, arg}
-        ]
+      [
+        Api.Cache,
+        # Start the Telemetry supervisor
+        AlertsViewerWeb.Telemetry,
+        # Start the PubSub system
+        {Phoenix.PubSub, name: AlertsViewer.PubSub},
+        # Start Finch
+        {Finch, name: AlertsViewer.Finch},
+        # Start the Endpoint (http/https)
+        AlertsViewerWeb.Endpoint
+        # Start a worker by calling: AlertsViewer.Worker.start_link(arg)
+        # {AlertsViewer.Worker, arg}
+      ] ++
+        if Application.get_env(:alerts_viewer, :start_data_processes) do
+          [
+            Alerts.Supervisor,
+            Routes.Supervisor,
+            Vehicles.Supervisor,
+            TripUpdates.Supervisor,
+            TripUpdates.GTFSSupervisor,
+            SnapshotLogger.SnapshotLogger
+          ]
+        else
+          []
+        end
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
