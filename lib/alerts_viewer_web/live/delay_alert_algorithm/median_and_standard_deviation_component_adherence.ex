@@ -81,7 +81,6 @@ defmodule AlertsViewer.DelayAlertAlgorithm.MedianAndStandardDeviationAdherenceCo
           <%= @min_std_val %>
         </span>
       </.controls_form>
-      <SnapshotButtonComponent.snapshot_button module_name={__MODULE__} />
     </div>
     """
   end
