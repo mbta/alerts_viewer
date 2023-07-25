@@ -4,7 +4,6 @@ defmodule AlertsViewer.DelayAlertAlgorithm.MedianAndStandardDeviationAdherenceCo
   """
 
   use AlertsViewerWeb, :live_component
-  alias AlertsViewer.DelayAlertAlgorithm.BaseAlgorithmComponents.SnapshotButtonComponent
 
   @behaviour AlertsViewer.DelayAlertAlgorithm
 
