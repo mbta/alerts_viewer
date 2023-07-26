@@ -5,8 +5,47 @@ defmodule SnapshotLogger.SnapshotLoggerTest do
   alias Alerts.{Alert, AlertsPubSub, Store}
   alias Routes.{RouteStats, RouteStatsPubSub}
 
+  alias Api.JsonApi.Item
+
+  @routes [
+    %Item{
+      type: "route",
+      id: "4",
+      attributes: %{
+        "long_name" => "Logan Airport Terminals - South Station",
+        "short_name" => "1",
+        "type" => 3
+      }
+    },
+    %Item{
+      type: "route",
+      id: "1",
+      attributes: %{
+        "long_name" => "Harvard Square - Nubian Station",
+        "short_name" => "4",
+        "type" => 3
+      }
+    },
+    %Item{
+      type: "route",
+      id: "1",
+      attributes: %{
+        "short_name" => "7",
+        "type" => 3
+      }
+    },
+    %Item{
+      type: "route",
+      id: "1",
+      attributes: %{
+        "short_name" => "8",
+        "type" => 3
+      }
+    }
+  ]
+
   @alert %Alert{
-    id: "1",
+    id: "112",
     header: "Alert 1",
     effect: :delay,
     created_at: ~U[2023-07-20 10:14:20Z],
@@ -17,25 +56,25 @@ defmodule SnapshotLogger.SnapshotLoggerTest do
 
   @stats_by_route %{
     "1" => %RouteStats{
-      id: "1",
+      id: "111",
       vehicles_schedule_adherence_secs: [10, 20],
       vehicles_instantaneous_headway_secs: [500, 1000],
       vehicles_scheduled_headway_secs: [40, 80],
       vehicles_instantaneous_minus_scheduled_headway_secs: [460, 920]
     },
     "4" => %RouteStats{
-      id: "4",
+      id: "113",
       vehicles_schedule_adherence_secs: [30]
     },
     "7" => %RouteStats{
-      id: "7",
+      id: "112",
       vehicles_schedule_adherence_secs: [10, 20],
       vehicles_instantaneous_headway_secs: [500, 1000],
       vehicles_scheduled_headway_secs: [40, 80],
       vehicles_instantaneous_minus_scheduled_headway_secs: [460, 920]
     },
     "8" => %RouteStats{
-      id: "8",
+      id: "114",
       vehicles_schedule_adherence_secs: [30]
     }
   }
@@ -60,10 +99,13 @@ defmodule SnapshotLogger.SnapshotLoggerTest do
         Map.put(state, :stats_by_route, @stats_by_route)
       end)
 
+      mock_route_opts = [get_fn: fn _, _ -> {:ok, %{data: @routes}} end]
+
       {:ok, pid} =
         SnapshotLogger.SnapshotLogger.start_link(
           name: :subscribe,
-          subscribe_fn: subscribe_fn
+          subscribe_fn: subscribe_fn,
+          route_opts: mock_route_opts
         )
 
       {:ok, pid: pid}
@@ -77,7 +119,8 @@ defmodule SnapshotLogger.SnapshotLoggerTest do
         pid |> :sys.get_state()
       end
 
-      assert capture_log(fun) =~ "[info] {\"max_adherence\""
+      assert capture_log([format: "$message"], fun) =~
+               "{\"max_adherence\":[{\"accuracy\":75,\"precision\":75,\"recall\":100,\"value\":0},"
     end
   end
 end

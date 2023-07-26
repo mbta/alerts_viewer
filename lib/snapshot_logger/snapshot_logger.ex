@@ -16,12 +16,12 @@ defmodule SnapshotLogger.SnapshotLogger do
   end
 
   @impl GenServer
-  def init(_opts) do
+  def init(opts) do
     delay_alert_algorithm_modules =
       Application.get_env(:alerts_viewer, :delay_alert_algorithm_components)
 
     bus_alerts = Alerts.subscribe() |> filtered_by_bus() |> filtered_by_delay_type()
-    bus_routes = Routes.all_bus_routes()
+    bus_routes = Routes.all_bus_routes(Keyword.get(opts, :route_opts, []))
     stats_by_route = RouteStatsPubSub.subscribe()
     routes_with_current_alerts = Enum.filter(bus_routes, &delay_alert?(&1, bus_alerts))
     schedule_logs()
@@ -67,7 +67,7 @@ defmodule SnapshotLogger.SnapshotLogger do
         snapshot_data = make_snapshot(module, state)
         Map.put(acc, module_name(module), snapshot_data)
       end)
-      |> Jason.encode!()
+      |> Jason.encode_to_iodata!()
 
     Logger.info(snapshot)
 
