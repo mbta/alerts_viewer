@@ -1,6 +1,6 @@
 defmodule AlertsViewer.StopRecommendationAlgorithm.MedianAdherenceComponent do
   @moduledoc """
-  Component for controlling the Max adherence delay alert recommendation algorithm.
+  Component for controlling the median adherence stop recommendation algorithm.
   """
 
   @snapshot_min 0

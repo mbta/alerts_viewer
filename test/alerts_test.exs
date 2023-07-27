@@ -216,22 +216,4 @@ defmodule AlertsTest do
       assert expected == actual
     end
   end
-
-  describe "alert_duration/2" do
-    test "returns duration of alert in hours" do
-      current_time = DateTime.new!(~D[2023-07-21], ~T[09:26:08.003], "America/New_York")
-
-      alert = %Alert{
-        id: 1,
-        severity: 3,
-        created_at: DateTime.add(current_time, -90, :minute),
-        informed_entity: [
-          %{route: "28", route_type: 3},
-          %{route: "29", route_type: 3}
-        ]
-      }
-
-      assert Alerts.alert_duration(alert, current_time) == 1.5
-    end
-  end
 end

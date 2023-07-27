@@ -1,6 +1,6 @@
 defmodule AlertsViewer.StopRecommendationAlgorithm.MedianInstantaneousMinusScheduledMedianHeadwayDiffComponent do
   @moduledoc """
-  Component for controlling the Max adherence delay alert recommendation algorithm.
+  Component for controlling the headway diff stop recommendation algorithm.
   """
 
   @snapshot_min 0

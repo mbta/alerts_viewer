@@ -80,7 +80,6 @@ defmodule AlertsViewerWeb.AlertsToCloseLive do
     |> filtered_by_bus()
     |> filtered_by_delay_type()
     |> Alerts.by_route()
-    |> Map.to_list()
     |> Enum.map(fn {head, tail} -> {String.to_atom(head), tail} end)
     |> Enum.sort_by(
       fn {_head, tail} -> Enum.max(Enum.map(tail, & &1.created_at), DateTime) end,

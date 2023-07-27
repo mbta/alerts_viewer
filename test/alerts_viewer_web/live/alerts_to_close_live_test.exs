@@ -22,7 +22,7 @@ defmodule AlertsViewerWeb.AlertsToCloseLiveTest do
     end
 
     test "connected mount", %{conn: conn} do
-      {:ok, _view, html} = live(conn, "/alerts_to_close")
+      {:ok, _view, html} = live(conn, "/alerts-to-close")
 
       assert html =~ ~r/Alerts/
     end

@@ -107,7 +107,7 @@ defmodule Routes.RouteStats do
   end
 
   @spec median_schedule_adherence(t()) :: number() | nil
-  @spec median_schedule_adherence(stats_by_route(), String.t()) :: number() | nil
+  @spec median_schedule_adherence(stats_by_route(), Route.id()) :: number() | nil
   @spec median_schedule_adherence(stats_by_route(), Route.t()) :: number() | nil
   def median_schedule_adherence(route_stats) do
     route_stats
