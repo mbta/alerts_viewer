@@ -25,6 +25,9 @@
   <:col :let={route} label="Route Name">
     <%= route %>
   </:col>
+  <:col :let={route} label="Alert Ids (sorted by duration)">
+    <%= Enum.map(@alerts_by_route[route], & &1.id) |> Enum.join(", ") %>
+  </:col>
   <:col :let={route} label="Median Adherence (minutes)">
     <%= RouteStats.median_schedule_adherence(@stats_by_route, Atom.to_string(route))
     |> seconds_to_minutes() %>

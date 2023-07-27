@@ -124,6 +124,6 @@ defmodule TripUpdates.TripUpdatesPubSub do
   end
 
   defp most_recent_stop_arrival(trip_update) do
-    Enum.map(trip_update.stop_time_update, & &1.arrival_time) |> Enum.max(DateTime)
+    trip_update.stop_time_update |> Enum.map(& &1.arrival_time) |> Enum.max(DateTime)
   end
 end
