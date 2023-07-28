@@ -49,7 +49,7 @@ defmodule PredictionResults do
   Formula: ((TP/ TP+FN) + (TN / TN+FP)) / 2
   or alternately: (recall + specificity) / 2
 
-  iex> PredictionResults.recall([:tp, :tn, :fp, :fn])
+  iex> PredictionResults.balanced_accuracy([:tp, :tp, :tn, :fp, :fp, :fn])
   50
   """
   @spec balanced_accuracy(t()) :: non_neg_integer()
@@ -57,6 +57,24 @@ defmodule PredictionResults do
     recall = recall(results)
     specificity = specificity(results)
     ((recall + specificity) / 2) |> round
+  end
+
+  @doc """
+  The harmonic mean of recall and precision
+  Formula: ((precision * recall)/(precision + recall)) * 2
+
+  iex> PredictionResults.f_measure([:tp, :tp, :tn, :fp, :fp, :fn])
+  57
+  """
+  @spec f_measure(t()) :: non_neg_integer()
+  def f_measure(results) do
+    recall = recall(results)
+    precision = precision(results)
+
+    case precision > 0 and recall > 0 do
+      true -> (precision * recall / (precision + recall) * 2) |> round
+      false -> 0
+    end
   end
 
   @doc """
