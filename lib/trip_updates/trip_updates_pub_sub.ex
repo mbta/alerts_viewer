@@ -107,23 +107,11 @@ defmodule TripUpdates.TripUpdatesPubSub do
   end
 
   def is_it_fresh?(trip_update, current_time \\ DateTime.now!("America/New_York")) do
-    # returns false if the latest time of a
-    # stop update departure with in it
-    # is over two hours old
-    # and the current time is between noon
-    # and midnight.
-    case current_time.hour <= 12 do
-      true ->
-        true
-
-      false ->
-        most_recent = most_recent_stop_arrival(trip_update)
-        hour_diff = DateTime.diff(current_time, most_recent, :hour)
-        if hour_diff >= 2, do: false, else: true
-    end
+    # returns true if most recent arrival time in a stop update is in the future
+    last_stop_arrival(trip_update) >= current_time
   end
 
-  defp most_recent_stop_arrival(trip_update) do
+  defp last_stop_arrival(trip_update) do
     trip_update.stop_time_update |> Enum.map(& &1.arrival_time) |> Enum.max(DateTime)
   end
 end

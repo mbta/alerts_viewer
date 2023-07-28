@@ -3,7 +3,7 @@ defmodule TripUpdates.TripUpdatesPubSubTest do
   alias TripUpdates.{StopTimeUpdate, TripUpdate, TripUpdatesPubSub}
 
   @stop_time_update_with_waiver %StopTimeUpdate{
-    arrival_time: DateTime.now!("America/New_York"),
+    arrival_time: DateTime.now!("America/New_York") |> DateTime.add(2, :hour),
     departure_time: nil,
     cause_id: 12,
     cause_description: nil,
@@ -123,47 +123,24 @@ defmodule TripUpdates.TripUpdatesPubSubTest do
   end
 
   describe "is_it_fresh" do
-    test "it's fresh if it's before noon no matter how stale stop times are" do
+    test "returns true if most recent stop time is in the future" do
       current_time = DateTime.new!(~D[2023-07-21], ~T[09:26:08.003], "America/New_York")
 
-      stale_stoptime =
-        Map.put(
-          @stop_time_update_with_waiver,
-          :arrival_time,
-          DateTime.add(current_time, -3, :hour)
-        )
-
-      stale_tripupdate = %TripUpdate{
-        stop_time_update: [
-          stale_stoptime
-        ],
-        trip: %{
-          trip_id: "t1",
-          route_id: "2"
-        }
-      }
-
-      assert TripUpdatesPubSub.is_it_fresh?(stale_tripupdate, current_time) == true
-    end
-
-    test "it's fresh if most recent is under 2 hours old and it's past noon" do
-      current_time = DateTime.new!(~D[2023-07-21], ~T[16:26:08.003], "America/New_York")
-
-      stale_stoptime =
-        Map.put(
-          @stop_time_update_with_waiver,
-          :arrival_time,
-          DateTime.add(current_time, -3, :hour)
-        )
-
       fresh_stoptime =
+        Map.put(
+          @stop_time_update_with_waiver,
+          :arrival_time,
+          DateTime.add(current_time, 1, :hour)
+        )
+
+      stale_stoptime =
         Map.put(
           @stop_time_update_with_waiver,
           :arrival_time,
           DateTime.add(current_time, -1, :hour)
         )
 
-      fresh_tripupdate = %TripUpdate{
+      stale_tripupdate = %TripUpdate{
         stop_time_update: [
           stale_stoptime,
           fresh_stoptime
@@ -174,10 +151,10 @@ defmodule TripUpdates.TripUpdatesPubSubTest do
         }
       }
 
-      assert TripUpdatesPubSub.is_it_fresh?(fresh_tripupdate, current_time) == true
+      assert TripUpdatesPubSub.is_it_fresh?(stale_tripupdate, current_time) == true
     end
 
-    test "it's stale if most recent is over 2 hours old and it's past noon" do
+    test "returns false if most recent stop time in the past" do
       current_time = DateTime.new!(~D[2023-07-21], ~T[16:26:08.003], "America/New_York")
 
       stale_stoptime =
