@@ -21,7 +21,7 @@ defmodule SnapshotLogger.SnapshotLogger do
       Application.get_env(:alerts_viewer, :delay_alert_algorithm_components)
 
     bus_alerts = Alerts.subscribe() |> filtered_by_bus() |> filtered_by_delay_type()
-    bus_routes = Routes.all_bus_routes(Keyword.get(opts, :route_opts, []))
+    bus_routes = opts |> Keyword.get(:route_opts, []) |> Routes.all_bus_routes()
     stats_by_route = RouteStatsPubSub.subscribe()
     routes_with_current_alerts = Enum.filter(bus_routes, &delay_alert?(&1, bus_alerts))
     schedule_logs()
@@ -31,8 +31,7 @@ defmodule SnapshotLogger.SnapshotLogger do
        bus_routes: bus_routes,
        stats_by_route: stats_by_route,
        routes_with_current_alerts: routes_with_current_alerts,
-       delay_alert_algorithm_modules: delay_alert_algorithm_modules,
-       routes_with_recommended_alerts: []
+       delay_alert_algorithm_modules: delay_alert_algorithm_modules
      }}
   end
 
