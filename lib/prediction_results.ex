@@ -25,22 +25,6 @@ defmodule PredictionResults do
   end
 
   @doc """
-  The percentage of all predictions that were correct. Rounded to the nearest
-  whole number.
-
-  Formula: TP+TN / TP+TN+FP+FN
-
-  iex> PredictionResults.accuracy([:tp, :tn, :fp, :fn])
-  50
-  """
-  @spec accuracy(t()) :: non_neg_integer()
-  def accuracy(results) do
-    true_count = Enum.count(results, &true_result?/1)
-
-    rounded_percent(true_count, length(results))
-  end
-
-  @doc """
   An accuracy measure that normalizes true positive
   and true negative predictions by the number of
   positive and negative samples, respectively,
