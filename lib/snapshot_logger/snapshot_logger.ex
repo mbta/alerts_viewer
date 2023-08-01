@@ -69,7 +69,7 @@ defmodule SnapshotLogger.SnapshotLogger do
 
     best_f_measure_snapshot =
       snapshot
-      |> Enum.map(fn {key, value} ->
+      |> Enum.into(%{}, fn {key, value} ->
         new_value =
           value
           |> Enum.map(&Map.take(&1, [:value, :f_measure]))
@@ -78,7 +78,6 @@ defmodule SnapshotLogger.SnapshotLogger do
 
         {key, new_value}
       end)
-      |> Enum.into(%{})
       |> Map.put(:name, "best_f_measure_snapshot")
 
     Logger.info(best_f_measure_snapshot |> Jason.encode_to_iodata!())
