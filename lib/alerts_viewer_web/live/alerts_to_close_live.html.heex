@@ -45,7 +45,10 @@
     <%= Enum.map(@alerts_by_route[route], &Alert.alert_duration(&1)) |> Enum.join(", ") %>
   </:col>
   <:col :let={route} label="Recommending Alert Closure">
-    <span :if={Enum.member?(@routes_with_recommended_closures, route)}>
+    <span
+      :if={Enum.member?(@routes_with_recommended_closures, route)}
+      class="text-red-600 font-bold"
+    >
       Y
     </span>
     <span :if={!Enum.member?(@routes_with_recommended_closures, route)}>
