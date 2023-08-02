@@ -33,6 +33,11 @@
     |> RouteStats.median_schedule_adherence(Atom.to_string(route))
     |> seconds_to_minutes() %>
   </:col>
+  <:col :let={route} label="Peak Adherence (minutes)">
+    <%= @stats_by_route
+    |> RouteStats.max_schedule_adherence(Atom.to_string(route))
+    |> seconds_to_minutes() %>
+  </:col>
   <:col :let={route} label="Median Instantaneous Headway (minutes)">
     <%= @stats_by_route
     |> RouteStats.median_instantaneous_headway(Atom.to_string(route))
