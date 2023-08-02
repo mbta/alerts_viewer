@@ -31,7 +31,8 @@ config :alerts_viewer,
   stop_recommendation_algorithm_components: [
     AlertsViewer.StopRecommendationAlgorithm.AlertDurationComponent,
     AlertsViewer.StopRecommendationAlgorithm.MedianHeadwayDeviationDiffComponent,
-    AlertsViewer.StopRecommendationAlgorithm.MedianAdherenceComponent
+    AlertsViewer.StopRecommendationAlgorithm.MedianAdherenceComponent,
+    AlertsViewer.StopRecommendationAlgorithm.HeadwayDeviationComponent
   ],
   trip_updates_url: {:system, "TRIP_UPDATES_URL"}
 
