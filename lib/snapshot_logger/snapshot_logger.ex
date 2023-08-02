@@ -67,20 +67,8 @@ defmodule SnapshotLogger.SnapshotLogger do
         Map.put(acc, module_name(module), snapshot_data)
       end)
 
-    best_f_measure_snapshot =
-      snapshot
-      |> Enum.into(%{}, fn {key, value} ->
-        new_value =
-          value
-          |> Enum.map(&Map.take(&1, [:value, :f_measure]))
-          |> Enum.sort_by(& &1.f_measure, :desc)
-          |> hd()
-
-        {key, new_value}
-      end)
-      |> Map.put(:name, "best_f_measure_snapshot")
-
-    Logger.info(best_f_measure_snapshot |> Jason.encode_to_iodata!())
+    Logger.info(best_variable_snapshot(snapshot, :f_measure) |> Jason.encode_to_iodata!())
+    Logger.info(best_variable_snapshot(snapshot, :balanced_accuracy) |> Jason.encode_to_iodata!())
     Logger.info(snapshot |> Jason.encode_to_iodata!())
 
     {:noreply, state}
@@ -109,6 +97,20 @@ defmodule SnapshotLogger.SnapshotLogger do
         precision: PredictionResults.precision(results)
       }
     end)
+  end
+
+  defp best_variable_snapshot(snapshot, variable) do
+    snapshot
+    |> Enum.into(%{}, fn {key, value} ->
+      new_value =
+        value
+        |> Enum.map(&Map.take(&1, [:value, variable]))
+        |> Enum.sort_by(& &1[variable], :desc)
+        |> hd()
+
+      {key, new_value}
+    end)
+    |> Map.put(:name, "best_#{Atom.to_string(variable)}_snapshot")
   end
 
   defp schedule_logs do
