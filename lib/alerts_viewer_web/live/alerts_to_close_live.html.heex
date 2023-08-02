@@ -36,6 +36,10 @@
     <%= RouteStats.median_instantaneous_headway(@stats_by_route, Atom.to_string(route))
     |> seconds_to_minutes() %>
   </:col>
+  <:col :let={route} label="Median Headway Deviation (minutes)">
+    <%= RouteStats.median_headway_deviation(@stats_by_route, Atom.to_string(route))
+    |> seconds_to_minutes() %>
+  </:col>
   <:col :let={route} label="Route has Cancelled Trip">
     <span :if={Enum.member?(@block_waivered_routes, Atom.to_string(route))}>
       ❌
