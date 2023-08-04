@@ -15,6 +15,8 @@ defmodule AlertsViewerWeb.AlertsToCloseLive do
     algorithm_options = algorithm_options(stop_recommendation_algorithm_components)
     current_algorithm = hd(stop_recommendation_algorithm_components)
 
+    bus_routes = Routes.all_bus_routes()
+
     alerts =
       if(connected?(socket),
         do: Alerts.subscribe(),
@@ -32,6 +34,7 @@ defmodule AlertsViewerWeb.AlertsToCloseLive do
         algorithm_options: algorithm_options,
         current_algorithm: current_algorithm,
         stats_by_route: stats_by_route,
+        bus_routes: bus_routes,
         block_waivered_routes: block_waivered_routes,
         alerts_by_route: alerts_by_route,
         routes_with_recommended_closures: []

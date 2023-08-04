@@ -50,4 +50,12 @@ defmodule Routes.Route do
     do: short_name
 
   def name(%__MODULE__{long_name: long_name}), do: long_name
+
+  @spec name_by_id([t()], String.t()) :: String.t()
+  def name_by_id(routes, route_id) do
+    case route = Enum.filter(routes, &(&1.id == route_id)) do
+      [] -> "#{route_id}"
+      [_ | _] -> route |> hd |> name
+    end
+  end
 end

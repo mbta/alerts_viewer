@@ -45,7 +45,7 @@ defmodule AlertsViewerWeb.BusLiveTest do
     }
   }
 
-  @block_waivered_routes ["66"]
+  @block_waivered_routes ["8"]
 
   describe "bus live page" do
     setup do
@@ -80,9 +80,7 @@ defmodule AlertsViewerWeb.BusLiveTest do
 
     test "connected mount", %{conn: conn} do
       use_cassette "routes", custom: true, clear_mock: true, match_requests_on: [:query] do
-        {:ok, view, html} = live(conn, "/bus")
-        # uncomment the below line to render page in browser
-        # open_browser(view)
+        {:ok, _view, html} = live(conn, "/bus")
         assert html =~ ~r/Bus Routes/
         assert html =~ ~r/Cool Bus Route/
       end
