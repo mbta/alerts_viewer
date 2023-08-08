@@ -44,18 +44,14 @@ defmodule Routes.Route do
   "short"
   iex> Route.name(%Route{id: "1", type: 3, long_name: "long"})
   "long"
+  iex> Route.name(%Route{id: "1", type: 3})
+  "1"
   """
   @spec name(t()) :: String.t()
   def name(%__MODULE__{short_name: short_name}) when short_name != nil and short_name != "",
     do: short_name
 
-  def name(%__MODULE__{long_name: long_name}), do: long_name
+  def name(%__MODULE__{long_name: long_name}) when long_name != nil, do: long_name
 
-  @spec name_by_id([t()], String.t()) :: String.t()
-  def name_by_id(routes, route_id) do
-    case route = Enum.filter(routes, &(&1.id == route_id)) do
-      [] -> "#{route_id}"
-      [_ | _] -> route |> hd |> name
-    end
-  end
+  def name(%__MODULE__{id: id}), do: id
 end

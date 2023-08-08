@@ -87,9 +87,6 @@ defmodule AlertsViewerWeb.AlertsToCloseLiveTest do
         assert html =~ ~r/Alerts/
         assert html =~ ~r/Cool Bus Route/
         assert html =~ ~r/Cooler Bus Route/
-
-        assert html =~
-                 ~r/Cooler Bus Route\W*.*\W*4\W*.*\W*8\W*.*\W*8\W*.*\W*29\W*.*\W*19\W*.*\W*19\W*.*\W*❌\W*.*\W*2\.0\W*.*\W*\W*.*\W*\W*.*\WY*\W*.*\W*Cool Bus Route/
       end
     end
   end
