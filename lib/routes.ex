@@ -21,10 +21,7 @@ defmodule Routes do
 
   @spec get_by_id([Route.t()], String.t()) :: Route.t()
   def get_by_id(routes, route_id) do
-    case routes = Enum.filter(routes, &(&1.id == route_id)) do
-      [_ | _] -> hd(routes)
-      [] -> %Route{id: route_id}
-    end
+    routes |> Enum.filter(&(&1.id == route_id)) |> hd()
   end
 
   @spec get_all_bus_routes(keyword()) :: {:ok, [Route.t()]} | {:error, any}
