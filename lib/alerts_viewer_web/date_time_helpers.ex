@@ -3,6 +3,9 @@ defmodule AlertsViewerWeb.DateTimeHelpers do
   Utility functions for formatting dates and times.
   """
 
+  @one_minute_in_seconds 60
+  @one_hour_in_seconds @one_minute_in_seconds * 60
+
   @doc """
   Return a human-friendly date-time string relative to "now".
   Use the time (converted to EST) if today, the month and day if this year, and the month and
@@ -27,6 +30,34 @@ defmodule AlertsViewerWeb.DateTimeHelpers do
     format = date_time_format(dt, now)
     Calendar.strftime(DateTime.shift_zone!(dt, "America/New_York"), format)
   end
+
+  @doc """
+  Return a human-friendly time duration string. Display in hours, rounded down,
+  if greater than 1 hour, otherwise in minutes rounded down.
+
+  iex> friendly_duration(7400)
+  "2 hours"
+  iex> friendly_duration(120)
+  "2 minutes"
+  iex> friendly_duration(5400)
+  "1 hour"
+  iex> friendly_duration(70)
+  "1 minute"
+  """
+  @spec friendly_duration(integer()) :: String.t()
+  def friendly_duration(time_in_secs)
+      when time_in_secs >= @one_hour_in_seconds and time_in_secs < 2 * @one_hour_in_seconds,
+      do: "1 hour"
+
+  def friendly_duration(time_in_secs) when time_in_secs >= @one_hour_in_seconds,
+    do: "#{floor(time_in_secs / @one_hour_in_seconds)} hours"
+
+  def friendly_duration(time_in_secs)
+      when time_in_secs >= @one_minute_in_seconds and time_in_secs < 2 * @one_minute_in_seconds,
+      do: "1 minute"
+
+  def friendly_duration(time_in_secs),
+    do: "#{floor(time_in_secs / @one_minute_in_seconds)} minutes"
 
   @doc """
   Change seconds into minutes, rounded to an integer
