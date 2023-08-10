@@ -37,9 +37,9 @@ defmodule AlertsViewer.StopRecommendationAlgorithm.AlertDurationComponent do
   end
 
   @spec recommending_closure?(
-          atom(),
+          String.t(),
           non_neg_integer(),
-          {Keyword.t(), RouteStats.stats_by_route()}
+          {map(), RouteStats.stats_by_route()}
         ) ::
           boolean()
   defp recommending_closure?(route, threshold_in_minutes, {alerts_by_route, _stats_by_route}) do

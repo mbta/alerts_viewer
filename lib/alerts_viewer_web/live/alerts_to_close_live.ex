@@ -25,7 +25,7 @@ defmodule AlertsViewerWeb.AlertsToCloseLive do
 
     stats_by_route = if(connected?(socket), do: RouteStatsPubSub.subscribe(), else: %{})
 
-    alerts_by_route = alerts_by_route(alerts, bus_routes)
+    sorted_alerts = sorted_alerts(alerts)
 
     block_waivered_routes = if(connected?(socket), do: TripUpdatesPubSub.subscribe(), else: [])
 
@@ -36,7 +36,8 @@ defmodule AlertsViewerWeb.AlertsToCloseLive do
         stats_by_route: stats_by_route,
         bus_routes: bus_routes,
         block_waivered_routes: block_waivered_routes,
-        alerts_by_route: alerts_by_route,
+        sorted_alerts: sorted_alerts,
+        alerts_by_route: Alerts.by_route(sorted_alerts),
         routes_with_recommended_closures: []
       )
 
@@ -45,8 +46,10 @@ defmodule AlertsViewerWeb.AlertsToCloseLive do
 
   @impl true
   def handle_info({:alerts, alerts}, socket) do
-    alerts_by_route = alerts_by_route(alerts, socket.assigns.bus_routes)
-    {:noreply, assign(socket, alerts_by_route: alerts_by_route)}
+    sorted_alerts = sorted_alerts(alerts)
+
+    {:noreply,
+     assign(socket, sorted_alerts: sorted_alerts, alerts_by_route: Alerts.by_route(sorted_alerts))}
   end
 
   @impl true
@@ -78,26 +81,31 @@ defmodule AlertsViewerWeb.AlertsToCloseLive do
     {:noreply, assign(socket, current_algorithm: current_algorithm)}
   end
 
-  @spec alerts_by_route([Alert.t()], [Route.t()]) :: keyword([Alert.t()])
-  defp alerts_by_route(alerts, bus_routes) do
-    route_ids = Enum.map(bus_routes, & &1.id)
-
+  @spec sorted_alerts([Alert.t()]) :: [Alert.t()]
+  defp sorted_alerts(alerts) do
     alerts
     |> filtered_by_bus()
     |> filtered_by_delay_type()
-    |> Alerts.by_route()
-    |> Enum.filter(fn {route_id, _alerts} ->
-      Enum.member?(route_ids, route_id)
-    end)
-    |> Enum.map(fn {route_id, alerts} -> {String.to_atom(route_id), alerts} end)
     |> Enum.sort_by(
-      fn {_route_id, alerts} ->
-        alerts
-        |> Enum.map(& &1.created_at)
-        |> Enum.max(DateTime)
-      end,
-      :asc
+      & &1.created_at,
+      {:asc, DateTime}
     )
+  end
+
+  @spec route_ids_from_alert(Alert.t()) :: [String.t()]
+  def route_ids_from_alert(alert) do
+    Enum.map(alert.informed_entity, fn entity ->
+      entity.route
+    end)
+  end
+
+  @spec route_names_from_alert(Alert.t(), [Route.t()]) :: [String.t()]
+  def route_names_from_alert(alert, bus_routes) do
+    alert
+    |> route_ids_from_alert()
+    |> Enum.map(&Routes.get_by_id(bus_routes, &1))
+    |> Enum.reject(&is_nil/1)
+    |> Enum.map(&Route.name/1)
   end
 
   @spec delay_alert?(Route.t(), [Alert.t()]) :: boolean()

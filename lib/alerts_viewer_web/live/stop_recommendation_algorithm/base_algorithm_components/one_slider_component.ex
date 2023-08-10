@@ -32,7 +32,7 @@ defmodule AlertsViewer.StopRecommendationAlgorithm.BaseAlgorithmComponents.OneSl
       def update(assigns, socket) do
         stats_by_route = Map.get(assigns, :stats_by_route, %{})
         alerts_by_route = Map.get(assigns, :alerts_by_route, [])
-        routes = Keyword.keys(alerts_by_route)
+        routes = Map.keys(alerts_by_route)
 
         routes_with_recommended_closures =
           Enum.filter(

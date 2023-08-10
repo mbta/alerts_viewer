@@ -5,7 +5,6 @@ defmodule AlertsViewer.StopRecommendationAlgorithm.AdherenceComponent do
 
   use AlertsViewerWeb, :live_component
 
-  alias Alerts.Alert
   alias AlertsViewerWeb.DateTimeHelpers
   alias Routes.RouteStats
 
@@ -36,11 +35,11 @@ defmodule AlertsViewer.StopRecommendationAlgorithm.AdherenceComponent do
     alerts_by_route = Map.get(assigns, :alerts_by_route, [])
     stats_by_route = Map.get(assigns, :stats_by_route, %{})
 
-    route_id_atoms = Keyword.keys(alerts_by_route)
+    route_ids = Map.keys(alerts_by_route)
 
     routes_with_recommended_closures =
       Enum.filter(
-        route_id_atoms,
+        route_ids,
         &recommending_closure?(
           &1,
           socket.assigns.duration,
@@ -58,7 +57,7 @@ defmodule AlertsViewer.StopRecommendationAlgorithm.AdherenceComponent do
 
     {:ok,
      assign(socket,
-       route_id_atoms: route_id_atoms,
+       route_ids: route_ids,
        stats_by_route: stats_by_route,
        alerts_by_route: alerts_by_route
      )}
@@ -128,7 +127,7 @@ defmodule AlertsViewer.StopRecommendationAlgorithm.AdherenceComponent do
 
     routes_with_recommended_closures =
       Enum.filter(
-        socket.assigns.route_id_atoms,
+        socket.assigns.route_ids,
         &recommending_closure?(
           &1,
           duration,
@@ -148,16 +147,16 @@ defmodule AlertsViewer.StopRecommendationAlgorithm.AdherenceComponent do
   end
 
   @spec recommending_closure?(
-          atom(),
+          String.t(),
           integer(),
           integer(),
           integer(),
-          keyword([Alert.t()]),
+          map(),
           RouteStats.stats_by_route()
         ) ::
           boolean()
   defp recommending_closure?(
-         route_id_atom,
+         route_id,
          duration_threshold_in_minutes,
          median_threshold_in_minutes,
          peak_threshold_in_minutes,
@@ -165,11 +164,11 @@ defmodule AlertsViewer.StopRecommendationAlgorithm.AdherenceComponent do
          stats_by_route
        ) do
     current_time = DateTime.now!("America/New_York")
-    route_id = Atom.to_string(route_id_atom)
+    route_id = route_id
 
     max =
       alerts_by_route
-      |> Keyword.get(route_id_atom)
+      |> Map.get(route_id)
       |> Enum.map(& &1.created_at)
       |> Enum.max(DateTime)
 

@@ -37,13 +37,13 @@ defmodule AlertsViewer.StopRecommendationAlgorithm.MedianAdherenceComponent do
   end
 
   @spec recommending_closure?(
-          atom(),
+          String.t() | Route.t(),
           non_neg_integer(),
-          {Keyword.t(), RouteStats.stats_by_route()}
+          {map(), RouteStats.stats_by_route()}
         ) ::
           boolean()
   defp recommending_closure?(route, threshold_in_minutes, {_alerts_by_route, stats_by_route}) do
-    median = RouteStats.median_schedule_adherence(stats_by_route, Atom.to_string(route))
+    median = RouteStats.median_schedule_adherence(stats_by_route, route)
     !is_nil(median) and median >= threshold_in_minutes * 60
   end
 end
