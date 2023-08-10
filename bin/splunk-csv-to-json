@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+if [ $# -ne 2 ]
+then
+  echo "Missing arguments. Run like: ./bin/splunk-csv-to-json /path/to/input.csv /path/to/output.json"
+  exit 1
+fi
+
+echo "Reading from: $1…"
+
+echo "[" > "$2"
+
+# Remove the header line and take the first "_raw" column
+csvcut -K 1 -c 1 "$1" |
+# Don't use double quotes in output
+csvformat --out-quoting 3 --out-no-doublequote --out-escapechar "\\" |
+# Add a comma to the end of each line except the last line
+sed -E '$ ! s/$/,/' |
+# Remove the instance ID, timestamp, and log level that come before the JSON
+sed -E 's/^.+\[info\] //' |
+# Un-escape commas
+sed -E 's/\\,/,/g' |
+# Un-escape quotes and write to output file
+sed -E 's/\\\"/\"/g' >> "$2"
+
+echo "]" >> "$2"
+
+echo "Wrote to: $2"
