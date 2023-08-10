@@ -20,17 +20,13 @@ defmodule AlertsViewerWeb.DateTimeHelpers do
   @spec friendly_date_time(DateTime.t() | nil) :: String.t()
   @spec friendly_date_time(DateTime.t() | nil, DateTime.t()) :: String.t()
   def friendly_date_time(dt, now \\ DateTime.now!("America/New_York"))
+
   def friendly_date_time(nil, _now), do: ""
 
   def friendly_date_time(dt, now) do
     format = date_time_format(dt, now)
     Calendar.strftime(DateTime.shift_zone!(dt, "America/New_York"), format)
   end
-
-  @spec date_time_format(DateTime.t(), DateTime.t()) :: String.t()
-  defp date_time_format(dt, now) when dt.day == now.day, do: "%-I:%M %p"
-  defp date_time_format(dt, now) when dt.year == now.year, do: "%b %-d"
-  defp date_time_format(_, _), do: "%b %Y"
 
   @doc """
   Change seconds into minutes, rounded to an integer
@@ -52,4 +48,9 @@ defmodule AlertsViewerWeb.DateTimeHelpers do
   def seconds_to_minutes(seconds) do
     round(seconds / 60)
   end
+
+  @spec date_time_format(DateTime.t(), DateTime.t()) :: String.t()
+  defp date_time_format(dt, now) when dt.day == now.day, do: "%-I:%M %p"
+  defp date_time_format(dt, now) when dt.year == now.year, do: "%b %-d"
+  defp date_time_format(_, _), do: "%b %Y"
 end
