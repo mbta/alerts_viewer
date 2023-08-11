@@ -37,8 +37,7 @@ defmodule AlertsViewerWeb.AlertsToCloseLive do
         bus_routes: bus_routes,
         block_waivered_routes: block_waivered_routes,
         sorted_alerts: sorted_alerts,
-        alerts_by_route: Alerts.by_route(sorted_alerts),
-        routes_with_recommended_closures: []
+        alerts_with_recommended_closures: []
       )
 
     {:ok, socket}
@@ -64,12 +63,12 @@ defmodule AlertsViewerWeb.AlertsToCloseLive do
 
   @impl true
   def handle_info(
-        {:updated_routes_with_recommended_closures, routes_with_recommended_closures},
+        {:updated_alerts_with_recommended_closures, alerts_with_recommended_closures},
         socket
       ) do
     socket =
       assign(socket,
-        routes_with_recommended_closures: routes_with_recommended_closures
+        alerts_with_recommended_closures: alerts_with_recommended_closures
       )
 
     {:noreply, socket}

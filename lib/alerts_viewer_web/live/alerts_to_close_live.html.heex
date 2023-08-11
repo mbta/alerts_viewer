@@ -16,7 +16,7 @@
   <.live_component
     module={@current_algorithm}
     id={:algorithm_controls}
-    alerts_by_route={@alerts_by_route}
+    alerts={@sorted_alerts}
     stats_by_route={@stats_by_route}
   />
 </div>
@@ -97,22 +97,12 @@
   </:col>
   <:col :let={alert} label="Recommending Alert Closure">
     <span
-      :if={
-        Enum.any?(
-          Alert.route_ids(alert),
-          &Enum.member?(@routes_with_recommended_closures, &1)
-        )
-      }
+      :if={Enum.member?(@alerts_with_recommended_closures, alert)}
       class="text-red-600 font-bold"
     >
       Y
     </span>
-    <span :if={
-      !Enum.any?(
-        Alert.route_ids(alert),
-        &Enum.member?(@routes_with_recommended_closures, &1)
-      )
-    }>
+    <span :if={!Enum.member?(@alerts_with_recommended_closures, alert)}>
       N
     </span>
   </:col>
