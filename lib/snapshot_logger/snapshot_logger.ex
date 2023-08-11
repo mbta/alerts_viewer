@@ -118,6 +118,9 @@ defmodule SnapshotLogger.SnapshotLogger do
         standard_deviation_of_schedule_adherence:
           RouteStats.standard_deviation_of_schedule_adherence(stats_by_route, route)
           |> DTH.seconds_to_minutes(),
+        max_instantaneous_headway:
+          RouteStats.max_instantaneous_headway(stats_by_route, route)
+          |> DTH.seconds_to_minutes(),
         median_instantaneous_headway:
           RouteStats.median_instantaneous_headway(stats_by_route, route)
           |> DTH.seconds_to_minutes(),
