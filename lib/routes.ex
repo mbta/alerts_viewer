@@ -21,9 +21,9 @@ defmodule Routes do
 
   @spec get_by_id([Route.t()], String.t()) :: Route.t() | nil
   def get_by_id(routes, route_id) do
-    case filtered_routes = Enum.filter(routes, &(&1.id == route_id)) do
+    case Enum.filter(routes, &(&1.id == route_id)) do
       [] -> nil
-      [_ | _] -> hd(filtered_routes)
+      [route | _] -> route
     end
   end
 

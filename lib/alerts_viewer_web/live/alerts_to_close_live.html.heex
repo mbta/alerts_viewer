@@ -30,57 +30,62 @@
   </:col>
   <:col :let={alert} label="Median Adherence (minutes)">
     <%= alert
-    |> route_ids_from_alert()
+    |> Alert.route_ids()
     |> Enum.map(fn route_id ->
       @stats_by_route
       |> RouteStats.median_schedule_adherence(route_id)
       |> seconds_to_minutes()
     end)
+    |> Enum.reject(&is_nil/1)
     |> Enum.join(",") %>
   </:col>
   <:col :let={alert} label="Peak Adherence (minutes)">
     <%= alert
-    |> route_ids_from_alert()
+    |> Alert.route_ids()
     |> Enum.map(fn route_id ->
       @stats_by_route
       |> RouteStats.max_schedule_adherence(route_id)
       |> seconds_to_minutes()
     end)
+    |> Enum.reject(&is_nil/1)
     |> Enum.join(",") %>
   </:col>
   <:col :let={alert} label="Median Instantaneous Headway (minutes)">
     <%= alert
-    |> route_ids_from_alert()
+    |> Alert.route_ids()
     |> Enum.map(fn route_id ->
       @stats_by_route
       |> RouteStats.median_instantaneous_headway(route_id)
       |> seconds_to_minutes()
     end)
+    |> Enum.reject(&is_nil/1)
     |> Enum.join(",") %>
   </:col>
   <:col :let={alert} label="Median Headway Deviation (minutes)">
     <%= alert
-    |> route_ids_from_alert()
+    |> Alert.route_ids()
     |> Enum.map(fn route_id ->
       @stats_by_route
       |> RouteStats.median_headway_deviation(route_id)
       |> seconds_to_minutes()
     end)
+    |> Enum.reject(&is_nil/1)
     |> Enum.join(",") %>
   </:col>
   <:col :let={alert} label="Peak Headway Deviation (minutes)">
     <%= alert
-    |> route_ids_from_alert()
+    |> Alert.route_ids()
     |> Enum.map(fn route_id ->
       @stats_by_route
       |> RouteStats.max_headway_deviation(route_id)
       |> seconds_to_minutes()
     end)
+    |> Enum.reject(&is_nil/1)
     |> Enum.join(",") %>
   </:col>
   <:col :let={alert} label="Route has Cancelled Trip">
     <span :if={
-      length(@block_waivered_routes -- route_ids_from_alert(alert)) <
+      length(@block_waivered_routes -- Alert.route_ids(alert)) <
         length(@block_waivered_routes)
     }>
       ❌
@@ -93,16 +98,20 @@
   <:col :let={alert} label="Recommending Alert Closure">
     <span
       :if={
-        length(@routes_with_recommended_closures -- route_ids_from_alert(alert)) <
-          length(@routes_with_recommended_closures)
+        Enum.any?(
+          Alert.route_ids(alert),
+          &Enum.member?(@routes_with_recommended_closures, &1)
+        )
       }
       class="text-red-600 font-bold"
     >
       Y
     </span>
     <span :if={
-      length(@routes_with_recommended_closures -- route_ids_from_alert(alert)) ==
-        length(@routes_with_recommended_closures)
+      !Enum.any?(
+        Alert.route_ids(alert),
+        &Enum.member?(@routes_with_recommended_closures, &1)
+      )
     }>
       N
     </span>

@@ -81,6 +81,15 @@ defmodule AlertsViewerWeb.AlertsToCloseLive do
     {:noreply, assign(socket, current_algorithm: current_algorithm)}
   end
 
+  @spec route_names_from_alert(Alert.t(), [Route.t()]) :: [String.t()]
+  def route_names_from_alert(alert, bus_routes) do
+    alert
+    |> Alert.route_ids()
+    |> Enum.map(&Routes.get_by_id(bus_routes, &1))
+    |> Enum.reject(&is_nil/1)
+    |> Enum.map(&Route.name/1)
+  end
+
   @spec sorted_alerts([Alert.t()]) :: [Alert.t()]
   defp sorted_alerts(alerts) do
     alerts
@@ -90,22 +99,6 @@ defmodule AlertsViewerWeb.AlertsToCloseLive do
       & &1.created_at,
       {:asc, DateTime}
     )
-  end
-
-  @spec route_ids_from_alert(Alert.t()) :: [String.t()]
-  def route_ids_from_alert(alert) do
-    Enum.map(alert.informed_entity, fn entity ->
-      entity.route
-    end)
-  end
-
-  @spec route_names_from_alert(Alert.t(), [Route.t()]) :: [String.t()]
-  def route_names_from_alert(alert, bus_routes) do
-    alert
-    |> route_ids_from_alert()
-    |> Enum.map(&Routes.get_by_id(bus_routes, &1))
-    |> Enum.reject(&is_nil/1)
-    |> Enum.map(&Route.name/1)
   end
 
   @spec delay_alert?(Route.t(), [Alert.t()]) :: boolean()
