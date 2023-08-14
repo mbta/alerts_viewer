@@ -1,4 +1,4 @@
-defmodule AlertsViewerWeb.InternalAlertsToCloseLive do
+defmodule AlertsViewerWeb.OpenDelayAlertsLive do
   @moduledoc """
   LiveView for displaying alerts that we can maybe close.
   """

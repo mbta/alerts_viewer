@@ -1,4 +1,4 @@
-defmodule AlertsViewerWeb.InternalAlertsToCloseLiveTest do
+defmodule AlertsViewerWeb.OpenDelayAlertsLiveTest do
   use ExUnit.Case
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
   use AlertsViewerWeb.ConnCase
@@ -83,7 +83,7 @@ defmodule AlertsViewerWeb.InternalAlertsToCloseLiveTest do
 
     test "connected mount", %{conn: conn} do
       use_cassette "routes", custom: true, clear_mock: true, match_requests_on: [:query] do
-        {:ok, _view, html} = live(conn, "/internal-alerts-to-close")
+        {:ok, _view, html} = live(conn, "/open-delay-alerts")
         assert html =~ ~r/Alerts/
         assert html =~ ~r/Cool Bus Route/
         assert html =~ ~r/Cooler Bus Route/
