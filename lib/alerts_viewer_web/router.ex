@@ -28,6 +28,7 @@ defmodule AlertsViewerWeb.Router do
 
     live("/bus", BusLive)
     live("/alerts-to-close", AlertsToCloseLive)
+    live("/internal-alerts-to-close", InternalAlertsToCloseLive)
   end
 
   # Other scopes may use custom stacks.

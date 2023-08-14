@@ -1,0 +1,109 @@
+<.header>
+  INTERNAL Canidates to Close
+</.header>
+
+<div class="flex gap-8">
+  <.controls_form phx-change="select-algorithm">
+    <.input
+      type="select"
+      name="algorithm"
+      label="Algorithm"
+      value={@current_algorithm}
+      options={@algorithm_options}
+    />
+  </.controls_form>
+
+  <.live_component
+    module={@current_algorithm}
+    id={:algorithm_controls}
+    alerts={@sorted_alerts}
+    stats_by_route={@stats_by_route}
+  />
+</div>
+
+<.table id="bus_alerts" sticky={true} rows={@sorted_alerts}>
+  <:col :let={alert} label="Alert Id (sorted by duration)">
+    <%= alert.id %>
+  </:col>
+  <:col :let={alert} label="Route Names">
+    <.informed_entity_icons entities={route_names_from_alert(alert, @bus_routes)} />
+  </:col>
+  <:col :let={alert} label="Median Adherence (minutes)">
+    <%= alert
+    |> Alert.route_ids()
+    |> Enum.map(fn route_id ->
+      @stats_by_route
+      |> RouteStats.median_schedule_adherence(route_id)
+      |> seconds_to_minutes()
+    end)
+    |> Enum.reject(&is_nil/1)
+    |> Enum.join(",") %>
+  </:col>
+  <:col :let={alert} label="Peak Adherence (minutes)">
+    <%= alert
+    |> Alert.route_ids()
+    |> Enum.map(fn route_id ->
+      @stats_by_route
+      |> RouteStats.max_schedule_adherence(route_id)
+      |> seconds_to_minutes()
+    end)
+    |> Enum.reject(&is_nil/1)
+    |> Enum.join(",") %>
+  </:col>
+  <:col :let={alert} label="Median Instantaneous Headway (minutes)">
+    <%= alert
+    |> Alert.route_ids()
+    |> Enum.map(fn route_id ->
+      @stats_by_route
+      |> RouteStats.median_instantaneous_headway(route_id)
+      |> seconds_to_minutes()
+    end)
+    |> Enum.reject(&is_nil/1)
+    |> Enum.join(",") %>
+  </:col>
+  <:col :let={alert} label="Median Headway Deviation (minutes)">
+    <%= alert
+    |> Alert.route_ids()
+    |> Enum.map(fn route_id ->
+      @stats_by_route
+      |> RouteStats.median_headway_deviation(route_id)
+      |> seconds_to_minutes()
+    end)
+    |> Enum.reject(&is_nil/1)
+    |> Enum.join(",") %>
+  </:col>
+  <:col :let={alert} label="Peak Headway Deviation (minutes)">
+    <%= alert
+    |> Alert.route_ids()
+    |> Enum.map(fn route_id ->
+      @stats_by_route
+      |> RouteStats.max_headway_deviation(route_id)
+      |> seconds_to_minutes()
+    end)
+    |> Enum.reject(&is_nil/1)
+    |> Enum.join(",") %>
+  </:col>
+  <:col :let={alert} label="Route has Cancelled Trip">
+    <span :if={
+      length(@block_waivered_routes -- Alert.route_ids(alert)) <
+        length(@block_waivered_routes)
+    }>
+      ❌
+    </span>
+  </:col>
+
+  <:col :let={alert} label="Alert Duration (hours)">
+    <%= Alert.alert_duration(alert) |> friendly_duration() %>
+  </:col>
+  <:col :let={alert} label="Recommending Alert Closure">
+    <span
+      :if={Enum.member?(@alerts_with_recommended_closures, alert)}
+      class="text-red-600 font-bold"
+    >
+      Y
+    </span>
+    <span :if={!Enum.member?(@alerts_with_recommended_closures, alert)}>
+      N
+    </span>
+  </:col>
+</.table>
