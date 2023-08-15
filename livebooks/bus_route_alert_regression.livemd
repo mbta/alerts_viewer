@@ -163,19 +163,29 @@ Use the model to make predictions on the test set.
 test_preds = Scholar.Linear.LogisticRegression.predict(model, test_inputs)
 ```
 
-Computer the accuracy for the model.
+Analyze the performance of the model.
+
+<!-- livebook:{"break_markdown":true} -->
+
+**Accuracy**
 
 ```elixir
 accuracy = Scholar.Metrics.accuracy(test_targets, test_preds)
 ```
 
+**F-measure**
+
 ```elixir
 f_measure = Scholar.Metrics.f1_score(test_targets, test_preds, num_classes: num_classes)
 ```
 
+**Recall**
+
 ```elixir
 recall = Scholar.Metrics.binary_recall(test_targets, test_preds)
 ```
+
+**Precision**
 
 ```elixir
 precision = Scholar.Metrics.binary_precision(test_targets, test_preds)
