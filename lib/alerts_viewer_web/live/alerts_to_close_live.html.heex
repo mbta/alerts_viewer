@@ -31,7 +31,7 @@
   <:col :let={alert} label="Route Names">
     <.informed_entity_icons entities={route_names_from_alert(alert, @bus_routes)} />
   </:col>
-  <:col :let={alert} label=" Average Adherence (minutes)">
+  <:col :let={alert} label="Average Adherence (minutes)">
     <%= alert
     |> Alert.route_ids()
     |> Enum.map(fn route_id ->

@@ -32,12 +32,12 @@ window.addEventListener("phx:page-loading-stop", info => topbar.hide())
 
 // Copy to the clipboard
 window.addEventListener("alerts_viewer:clipcopy", (event) => {
-    if ("clipboard" in navigator) {
-        const text = event.target.textContent.trim();
-        navigator.clipboard.writeText(text);
-    } else {
-        alert("Sorry, your browser does not support clipboard copy.");
-    }
+  if ("clipboard" in navigator) {
+    const text = event.target.textContent.trim();
+    navigator.clipboard.writeText(text);
+  } else {
+    alert("Sorry, your browser does not support clipboard copy.");
+  }
 });
 
 // connect if there are any LiveViews on the page
