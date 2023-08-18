@@ -140,9 +140,9 @@ defmodule AlertsViewerWeb.AlertsToCloseLive do
       |> Enum.reject(&is_nil/1)
 
     peak =
-      case(length(headways) > 0) do
-        true -> Enum.max(headways)
-        false -> nil
+      case headways do
+        [_ | _] -> Enum.max(headways)
+        [] -> nil
       end
 
     duration >= duration_threshold_in_minutes and
