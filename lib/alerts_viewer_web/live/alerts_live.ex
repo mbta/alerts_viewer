@@ -11,7 +11,12 @@ defmodule AlertsViewerWeb.AlertsLive do
   @impl true
   def mount(_params, _session, socket) do
     alerts = if(connected?(socket), do: Alerts.subscribe(), else: [])
-    socket = update_alerts_and_filter(socket, alerts, effect: "", service: "", search: "")
+
+    socket =
+      socket
+      |> stream_configure(:alerts, dom_id: &"alert-#{&1.id}")
+      |> update_alerts_and_filter(alerts, effect: "", service: "", search: "")
+
     {:ok, socket}
   end
 
@@ -45,10 +50,8 @@ defmodule AlertsViewerWeb.AlertsLive do
         {:alerts, alerts},
         %{assigns: %{effect: effect, service: service, search: search}} = socket
       ) do
-    socket =
-      update_alerts_and_filter(socket, alerts, effect: effect, service: service, search: search)
-
-    {:noreply, socket}
+    {:noreply,
+     update_alerts_and_filter(socket, alerts, effect: effect, service: service, search: search)}
   end
 
   @impl true
@@ -60,14 +63,12 @@ defmodule AlertsViewerWeb.AlertsLive do
     effect = if effect_input == "All Effects", do: "", else: effect_input
     service = if service_input == "All Service Types", do: "", else: service_input
 
-    socket =
-      update_alerts_and_filter(socket, Alerts.all(),
-        effect: effect,
-        service: service,
-        search: search
-      )
-
-    {:noreply, socket}
+    {:noreply,
+     update_alerts_and_filter(socket, Alerts.all(),
+       effect: effect,
+       service: service,
+       search: search
+     )}
   end
 
   @spec effect_filter_options :: [tuple()]
@@ -80,7 +81,10 @@ defmodule AlertsViewerWeb.AlertsLive do
           Phoenix.LiveView.Socket.t()
   defp update_alerts_and_filter(socket, alerts, filter_params) do
     alerts = filter_and_search(alerts, filter_params)
-    assign(socket, filter_params ++ [alerts: alerts])
+
+    socket
+    |> stream(:alerts, alerts, reset: true)
+    |> assign(filter_params)
   end
 
   @spec filter_and_search([Alert.t()], keyword()) :: [Alert.t()]
