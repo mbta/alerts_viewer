@@ -23,20 +23,31 @@ defmodule AlertsViewerWeb.AlertsToCloseLive do
 
     stats_by_route = if(connected?(socket), do: RouteStatsPubSub.subscribe(), else: %{})
 
-    sorted_alerts = sorted_alerts(alerts)
-
-    block_waivered_routes = if(connected?(socket), do: TripUpdatesPubSub.subscribe(), else: [])
+    sorted_alerts =
+      alerts
+      |> sorted_alerts()
 
     recommended_closures = recommended_closures(sorted_alerts, stats_by_route)
+
+    sorted_alerts =
+      Enum.map(sorted_alerts, fn alert ->
+        case Enum.member?(recommended_closures, alert) do
+          true -> alert
+          false -> Map.put(alert, :row_class, " text-zinc-300")
+        end
+      end)
+
+    block_waivered_routes = if(connected?(socket), do: TripUpdatesPubSub.subscribe(), else: [])
 
     socket =
       assign(socket,
         stats_by_route: stats_by_route,
         bus_routes: bus_routes,
         block_waivered_routes: block_waivered_routes,
-        sorted_alerts: sorted_alerts,
         alerts_with_recommended_closures: recommended_closures
       )
+      |> stream_configure(:alerts, dom_id: &"alert-#{&1.id}")
+      |> stream(:alerts, sorted_alerts, reset: true)
 
     {:ok, socket}
   end
@@ -47,16 +58,25 @@ defmodule AlertsViewerWeb.AlertsToCloseLive do
 
     recommended_closures = recommended_closures(sorted_alerts, socket.assigns.stats_by_route)
 
-    {:noreply,
-     assign(socket,
-       sorted_alerts: sorted_alerts,
-       alerts_with_recommended_closures: recommended_closures
-     )}
+    sorted_alerts =
+      Enum.map(sorted_alerts, fn alert ->
+        case Enum.member?(recommended_closures, alert) do
+          true -> alert
+          false -> Map.put(alert, :row_class, " text-zinc-300")
+        end
+      end)
+
+    socket =
+      socket
+      |> stream(:alerts, sorted_alerts, reset: true)
+      |> assign(alerts_with_recommended_closures: recommended_closures)
+
+    {:noreply, socket}
   end
 
   @impl true
   def handle_info({:stats_by_route, stats_by_route}, socket) do
-    recommended_closures = recommended_closures(socket.assigns.sorted_alerts, stats_by_route)
+    recommended_closures = recommended_closures(sorted_alerts(Alerts.all()), stats_by_route)
 
     {:noreply,
      assign(socket,

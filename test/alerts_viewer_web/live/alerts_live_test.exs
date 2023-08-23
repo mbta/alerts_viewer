@@ -43,7 +43,6 @@ defmodule AlertsViewerWeb.AlertsLiveTest do
       refute render(view) =~ "alert2"
 
       send(view.pid, {:alerts, [@alert2]})
-      open_browser(view)
       refute render(view) =~ "alert1"
       assert render(view) =~ "alert2"
     end

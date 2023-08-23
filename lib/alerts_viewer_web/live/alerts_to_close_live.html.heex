@@ -2,19 +2,7 @@
   Candidates to Close
 </.header>
 
-<.table
-  id="bus_alerts"
-  sticky={true}
-  rows={
-    @sorted_alerts
-    |> Enum.map(fn alert ->
-      case Enum.member?(@alerts_with_recommended_closures, alert) do
-        true -> alert
-        false -> Map.put(alert, :row_class, " text-zinc-300")
-      end
-    end)
-  }
->
+<.stream_table id="closable_alerts" sticky={true} rows={@streams.alerts}>
   <:col :let={alert} label="Route(s)">
     <.informed_entity_icons entities={route_names_from_alert(alert, @bus_routes)} />
   </:col>
@@ -77,4 +65,4 @@
       N
     </span>
   </:col>
-</.table>
+</.stream_table>
