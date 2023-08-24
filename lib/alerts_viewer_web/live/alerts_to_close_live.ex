@@ -8,6 +8,13 @@ defmodule AlertsViewerWeb.AlertsToCloseLive do
   alias Routes.{Route, RouteStats, RouteStatsPubSub}
   alias TripUpdates.TripUpdatesPubSub
 
+  @type alert_row :: %{
+          alert: Alert.t(),
+          block_waivered: boolean(),
+          recommended_closure: boolean(),
+          stats_by_route: %{Route.id() => RouteStats.t()}
+        }
+
   @max_alert_duration 60
   @min_peak_headway 15
 
@@ -39,24 +46,57 @@ defmodule AlertsViewerWeb.AlertsToCloseLive do
 
     block_waivered_routes = if(connected?(socket), do: TripUpdatesPubSub.subscribe(), else: [])
 
+    alert_rows =
+      create_alert_rows(
+        sorted_alerts,
+        stats_by_route,
+        block_waivered_routes,
+        recommended_closures,
+        bus_routes
+      )
+
     socket =
       assign(socket,
-        stats_by_route: stats_by_route,
-        bus_routes: bus_routes,
-        block_waivered_routes: block_waivered_routes,
-        alerts_with_recommended_closures: recommended_closures
+        bus_routes: bus_routes
       )
-      |> stream_configure(:alerts, dom_id: &"alert-#{&1.id}")
-      |> stream(:alerts, sorted_alerts, reset: true)
+      |> stream_configure(:alert_rows, dom_id: &"alert-#{&1.alert.id}")
+      |> stream(:alert_rows, alert_rows, reset: true)
 
     {:ok, socket}
+  end
+
+  @spec create_alert_rows([Alert.t()], RouteStats.stats_by_route(), [String.t()], [String.t()], [
+          Route.t()
+        ]) ::
+          [alert_row()]
+  def create_alert_rows(
+        alerts,
+        stats_by_route,
+        block_waivered_routes,
+        recommended_closures,
+        bus_routes
+      ) do
+    Enum.map(alerts, fn alert ->
+      route_ids = route_names_from_alert(alert, bus_routes)
+      has_block_waiver = Enum.any?(route_ids, &Enum.member?(block_waivered_routes, &1))
+      has_recommended_closure = Enum.member?(recommended_closures, alert)
+      selected_stats_by_route = Map.take(stats_by_route, route_ids)
+
+      %{
+        alert: alert,
+        block_waivered: has_block_waiver,
+        recommended_closure: has_recommended_closure,
+        stats_by_route: selected_stats_by_route
+      }
+    end)
   end
 
   @impl true
   def handle_info({:alerts, alerts}, socket) do
     sorted_alerts = sorted_alerts(alerts)
-
-    recommended_closures = recommended_closures(sorted_alerts, socket.assigns.stats_by_route)
+    stats_by_route = RouteStatsPubSub.all()
+    recommended_closures = recommended_closures(sorted_alerts, stats_by_route)
+    block_waivered_routes = TripUpdatesPubSub.all()
 
     sorted_alerts =
       Enum.map(sorted_alerts, fn alert ->
@@ -66,28 +106,65 @@ defmodule AlertsViewerWeb.AlertsToCloseLive do
         end
       end)
 
+    alert_rows =
+      create_alert_rows(
+        sorted_alerts,
+        stats_by_route,
+        block_waivered_routes,
+        recommended_closures,
+        socket.assigns.bus_routes
+      )
+
     socket =
       socket
-      |> stream(:alerts, sorted_alerts, reset: true)
-      |> assign(alerts_with_recommended_closures: recommended_closures)
+      |> stream(:alert_rows, alert_rows, reset: true)
 
     {:noreply, socket}
   end
 
   @impl true
   def handle_info({:stats_by_route, stats_by_route}, socket) do
+    sorted_alerts = sorted_alerts(Alerts.all())
+
     recommended_closures = recommended_closures(sorted_alerts(Alerts.all()), stats_by_route)
 
-    {:noreply,
-     assign(socket,
-       stats_by_route: stats_by_route,
-       alerts_with_recommended_closures: recommended_closures
-     )}
+    block_waivered_routes = TripUpdatesPubSub.all()
+
+    alert_rows =
+      create_alert_rows(
+        sorted_alerts,
+        stats_by_route,
+        block_waivered_routes,
+        recommended_closures,
+        socket.assigns.bus_routes
+      )
+
+    socket
+    |> stream(:alert_rows, alert_rows, reset: true)
+
+    {:noreply, socket}
   end
 
   @impl true
   def handle_info({:block_waivered_routes, block_waivered_routes}, socket) do
-    {:noreply, assign(socket, block_waivered_routes: block_waivered_routes)}
+    stats_by_route = RouteStatsPubSub.all()
+    sorted_alerts = sorted_alerts(Alerts.all())
+
+    recommended_closures = recommended_closures(sorted_alerts(Alerts.all()), stats_by_route)
+
+    alert_rows =
+      create_alert_rows(
+        sorted_alerts,
+        stats_by_route,
+        block_waivered_routes,
+        recommended_closures,
+        socket.assigns.bus_routes
+      )
+
+    socket
+    |> stream(:alert_rows, alert_rows, reset: true)
+
+    {:noreply, socket}
   end
 
   def recommended_closures(alerts, stats_by_route) do
@@ -167,5 +244,17 @@ defmodule AlertsViewerWeb.AlertsToCloseLive do
 
     duration >= duration_threshold_in_minutes and
       (!is_nil(peak) and peak <= peak_threshold_in_minutes)
+  end
+
+  defp format_stats(alert, stats_by_route, stats_function) do
+    alert
+    |> Alert.route_ids()
+    |> Enum.map(fn route_id ->
+      stats_by_route
+      |> stats_function.(route_id)
+      |> seconds_to_minutes()
+    end)
+    |> Enum.reject(&is_nil/1)
+    |> Enum.join(",")
   end
 end
