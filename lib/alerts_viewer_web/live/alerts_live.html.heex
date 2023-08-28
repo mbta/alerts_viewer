@@ -38,7 +38,7 @@
   />
 </.controls_form>
 
-<.stream_table id="alerts" rows={@streams.alerts} row_click={&JS.patch(~p"/alerts/#{&1}")}>
+<.table id="alerts" rows={@streams.alerts} row_click={&JS.patch(~p"/alerts/#{&1}")} stream={true}>
   <:col :let={alert} label="ID">
     <%= alert.id %>
   </:col>
@@ -69,7 +69,7 @@
       more={length(alert.active_period) > 3}
     />
   </:col>
-</.stream_table>
+</.table>
 
 <.modal :if={@live_action == :show} id="alert-modal" show on_cancel={JS.navigate(~p"/alerts")}>
   <.live_component

@@ -2,7 +2,7 @@
   Candidates to Close
 </.header>
 
-<.stream_table id="closable_alerts" sticky={true} rows={@streams.alert_rows}>
+<.table id="closable_alerts" sticky={true} rows={@streams.alert_rows} stream={true}>
   <:col :let={alert_row} label="Route(s)">
     <.informed_entity_icons entities={route_names_from_alert(alert_row.alert, @bus_routes)} />
   </:col>
@@ -54,4 +54,4 @@
       N
     </span>
   </:col>
-</.stream_table>
+</.table>
