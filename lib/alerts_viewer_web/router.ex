@@ -4,6 +4,7 @@ defmodule AlertsViewerWeb.Router do
   pipeline :browser do
     plug(:accepts, ["html"])
     plug(:fetch_session)
+    plug AlertsViewerWeb.Plug.PutFlagsInSessionPlug
     plug(:fetch_live_flash)
     plug(:put_root_layout, {AlertsViewerWeb.Layouts, :root})
     plug(:protect_from_forgery)
@@ -18,17 +19,23 @@ defmodule AlertsViewerWeb.Router do
     get("/_health", HealthController, :index)
   end
 
-  scope "/", AlertsViewerWeb do
-    pipe_through(:browser)
+  scope "/_flags", Laboratory do
+    forward "/", Router
+  end
 
-    get("/", PageController, :home)
+  live_session :default, on_mount: AlertsViewerWeb.PutFlagsInAssignsHook do
+    scope "/", AlertsViewerWeb do
+      pipe_through(:browser)
 
-    live("/alerts", AlertsLive, :index)
-    live("/alerts/:id", AlertsLive, :show)
+      get("/", PageController, :home)
 
-    live("/bus", BusLive)
-    live("/alerts-to-close", AlertsToCloseLive)
-    live("/open-delay-alerts", OpenDelayAlertsLive)
+      live("/alerts", AlertsLive, :index)
+      live("/alerts/:id", AlertsLive, :show)
+
+      live("/bus", BusLive)
+      live("/alerts-to-close", AlertsToCloseLive)
+      live("/open-delay-alerts", OpenDelayAlertsLive)
+    end
   end
 
   # Other scopes may use custom stacks.
