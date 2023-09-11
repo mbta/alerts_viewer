@@ -145,7 +145,7 @@ defmodule AlertsViewerWeb.AlertsToCloseLiveTest do
       end
     end
 
-    test "Extra links hown if internal_pages flag isset", %{conn: conn} do
+    test "Extra links shown if internal_pages flag is set", %{conn: conn} do
       use_cassette "routes", custom: true, clear_mock: true, match_requests_on: [:query] do
         conn = conn |> put_resp_cookie("show_internal_pages_flag", "true")
         {:ok, _view, html} = live(conn, "/alerts-to-close")
