@@ -86,16 +86,16 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
-# Import environment specific config. This must remain at the bottom
-# of this file so it overrides the configuration defined above.
-import_config "#{config_env()}.exs"
-
 config :laboratory,
   features: [
-    {:internal_pages_flag, "Internal Pages", "Makes links to internal-only pages visible"}
+    {:show_internal_pages_flag, "Internal Pages", "Makes links to internal-only pages visible"}
   ],
   cookie: [
     # one month,
     max_age: 3600 * 24 * 30,
     http_only: true
   ]
+
+# Import environment specific config. This must remain at the bottom
+# of this file so it overrides the configuration defined above.
+import_config "#{config_env()}.exs"

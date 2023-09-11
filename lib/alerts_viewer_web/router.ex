@@ -1,10 +1,14 @@
 defmodule AlertsViewerWeb.Router do
   use AlertsViewerWeb, :router
 
+  pipeline :get_flags do
+    plug AlertsViewerWeb.Plug.PutFlagsInSessionPlug
+  end
+
   pipeline :browser do
     plug(:accepts, ["html"])
     plug(:fetch_session)
-    plug AlertsViewerWeb.Plug.PutFlagsInSessionPlug
+    plug(:get_flags)
     plug(:fetch_live_flash)
     plug(:put_root_layout, {AlertsViewerWeb.Layouts, :root})
     plug(:protect_from_forgery)
@@ -20,6 +24,7 @@ defmodule AlertsViewerWeb.Router do
   end
 
   scope "/_flags", Laboratory do
+    pipe_through(:browser)
     forward "/", Router
   end
 
