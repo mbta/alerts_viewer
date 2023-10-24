@@ -317,18 +317,9 @@ defmodule Routes.RouteStats do
 
   @spec headway_deviation_secs_of_vehicles([Vehicle.t()]) :: [integer()]
   defp headway_deviation_secs_of_vehicles(vehicles) do
-    Enum.reject(
-      vehicles,
-      &(is_nil(Vehicle.scheduled_headway_secs(&1)) or
-          is_nil(Vehicle.instantaneous_headway_secs(&1)))
-    )
-    |> Enum.reduce([], fn vehicle, acc ->
-      scheduled_secs = Vehicle.scheduled_headway_secs(vehicle)
-      instantaneous_secs = Vehicle.instantaneous_headway_secs(vehicle)
-
-      [instantaneous_secs - scheduled_secs | acc]
-    end)
-    |> Enum.reverse()
+    vehicles
+    |> Enum.filter(&Vehicle.headway_deviation?/1)
+    |> Enum.map(&Vehicle.headway_deviation/1)
   end
 
   defp map_and_remove_nils(vehicles, function) do
