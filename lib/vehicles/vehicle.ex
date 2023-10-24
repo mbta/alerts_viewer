@@ -65,6 +65,20 @@ defmodule Vehicles.Vehicle do
   defp rounded_or_nil(secs) when is_number(secs), do: round(secs)
 
   @doc """
+  Return the ID for the vehicle.
+
+  iex> Vehicle.id(%Vehicle{id: "1234"})
+  "1234"
+  iex> Vehicle.id(%Vehicle{})
+  ""
+  iex> Vehicle.id(nil)
+  ""
+  """
+  @spec id(t() | nil) :: String.t()
+  def id(%__MODULE__{id: id}) when id != nil, do: id
+  def id(_), do: ""
+
+  @doc """
   Returns whether or noth the vehicle has a route ID.
 
   iex> Vehicle.route_id?(%Vehicle{route_id: "39"})

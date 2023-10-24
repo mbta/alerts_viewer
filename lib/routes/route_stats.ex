@@ -11,7 +11,8 @@ defmodule Routes.RouteStats do
     vehicles_schedule_adherence_secs: [],
     vehicles_instantaneous_headway_secs: [],
     vehicles_scheduled_headway_secs: [],
-    vehicles_headway_deviation_secs: []
+    vehicles_headway_deviation_secs: [],
+    vehicles: []
   ]
 
   @type t :: %__MODULE__{
@@ -19,7 +20,8 @@ defmodule Routes.RouteStats do
           vehicles_schedule_adherence_secs: [integer()],
           vehicles_instantaneous_headway_secs: [integer() | nil],
           vehicles_scheduled_headway_secs: [integer() | nil],
-          vehicles_headway_deviation_secs: [integer() | nil]
+          vehicles_headway_deviation_secs: [integer() | nil],
+          vehicles: [Vehicle.t()]
         }
 
   @type stats_by_route() :: %{Route.id() => t()}
@@ -31,7 +33,8 @@ defmodule Routes.RouteStats do
       vehicles_schedule_adherence_secs: schedule_adherence_secs_of_vehicles(vehicles),
       vehicles_instantaneous_headway_secs: instantaneous_headway_secs_of_vehicles(vehicles),
       vehicles_scheduled_headway_secs: scheduled_headway_secs_of_vehicles(vehicles),
-      vehicles_headway_deviation_secs: headway_deviation_secs_of_vehicles(vehicles)
+      vehicles_headway_deviation_secs: headway_deviation_secs_of_vehicles(vehicles),
+      vehicles: vehicles
     }
   end
 
@@ -299,6 +302,21 @@ defmodule Routes.RouteStats do
 
   def stats_for_route(stats_by_route, route_id) when is_binary(route_id),
     do: Map.get(stats_by_route, route_id, %__MODULE__{})
+
+  @spec vehicle_with_max_headway_deviation(t()) :: Vehicle.t() | nil
+  @spec vehicle_with_max_headway_deviation(stats_by_route(), Route.t()) :: Vehicle.t() | nil
+  @spec vehicle_with_max_headway_deviation(stats_by_route(), Route.id()) :: Vehicle.t() | nil
+  def vehicle_with_max_headway_deviation(%__MODULE__{vehicles: vehicles}) do
+    vehicles
+    |> Enum.filter(&Vehicle.headway_deviation?/1)
+    |> Enum.max_by(&Vehicle.headway_deviation/1, fn -> nil end)
+  end
+
+  def vehicle_with_max_headway_deviation(stats_by_route, route_or_route_id) do
+    stats_by_route
+    |> stats_for_route(route_or_route_id)
+    |> vehicle_with_max_headway_deviation()
+  end
 
   @spec schedule_adherence_secs_of_vehicles([Vehicle.t()]) :: [integer()]
   defp schedule_adherence_secs_of_vehicles(vehicles) do
