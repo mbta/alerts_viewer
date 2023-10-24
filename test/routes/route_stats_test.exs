@@ -418,8 +418,8 @@ defmodule Routes.RouteStatsTest do
     end
   end
 
-  describe "standard_deviation_of_headway_deviation rounded to 1 place" do
-    test "" do
+  describe "standard_deviation_of_headway_deviation" do
+    test "returns the standard deviation of headway deviation for all vehicles rounded to 1 place" do
       route_stats = %RouteStats{
         id: "1",
         vehicles_headway_deviation_secs: [1, 2]
