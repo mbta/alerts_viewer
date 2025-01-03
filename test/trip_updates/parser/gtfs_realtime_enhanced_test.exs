@@ -8,16 +8,16 @@ defmodule TripUpdates.Parser.GTFSRealtimeEnhancedTest do
 
   describe "parse/1" do
     test "parsing an enhanced TripUpdates JSON file returns TripUpdate and StopTimeUpdate structs" do
-      binary = File.read!(fixture_path("trip_updates_enhanced.json"))
-      parsed = GTFSRealtimeEnhanced.parse(binary)
+      json = json_from_fixture("trip_updates_enhanced.json")
+      parsed = GTFSRealtimeEnhanced.parse(json)
       assert is_list(parsed)
       assert Enum.all?(parsed, &(&1.__struct__ in [TripUpdate]))
     end
 
     test "parsing a TripUpdates file preserves the remark field on StopTimeUpdate structs" do
-      binary = File.read!(fixture_path("trip_updates_enhanced.json"))
+      json = json_from_fixture("trip_updates_enhanced.json")
 
-      stop_time_updates = hd(GTFSRealtimeEnhanced.parse(binary)).stop_time_update
+      stop_time_updates = hd(GTFSRealtimeEnhanced.parse(json)).stop_time_update
 
       assert length(stop_time_updates) > 0
       assert Enum.all?(stop_time_updates, &(&1.__struct__ in [StopTimeUpdate]))
@@ -38,4 +38,6 @@ defmodule TripUpdates.Parser.GTFSRealtimeEnhancedTest do
       assert GTFSRealtimeEnhanced.date(nil) == nil
     end
   end
+
+ 
 end

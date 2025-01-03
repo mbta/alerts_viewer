@@ -6,11 +6,7 @@ defmodule TripUpdates.Parser.GTFSRealtimeEnhanced do
   require Logger
   alias TripUpdates.{StopTimeUpdate, Trip, TripUpdate}
 
-  def parse(binary) when is_binary(binary) do
-    binary
-    |> Jason.decode!(strings: :copy)
-    |> decode_entities()
-  end
+  def parse(json), do: decode_entities(json)
 
   @spec decode_entities(map()) :: [TripUpdate.t() | StopTimeUpdate.t()]
   defp decode_entities(%{"entity" => entities}),
