@@ -52,7 +52,7 @@ defmodule Vehicles.Supervisor do
   defp http_source(source, url, parser, opts) do
     Supervisor.child_spec(
       {
-        HttpProducer,
+        HttpStage,
         {url, [name: source, parser: parser] ++ opts}
       },
       id: source
